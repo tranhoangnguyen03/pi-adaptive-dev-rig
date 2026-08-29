@@ -1,9 +1,9 @@
 diff --git a/totals.py b/totals.py
 new file mode 100644
-index 0000000..d47e4de
+index 0000000..2132055
 --- /dev/null
 +++ b/totals.py
-@@ -0,0 +1,34 @@
+@@ -0,0 +1,35 @@
 +"""Totals via regex timestamp parsing (alternate valid implementation)."""
 +import csv
 +import json
@@ -15,21 +15,22 @@ index 0000000..d47e4de
 +TS = re.compile(r"^(\d{4})-(\d{1,2})-(\d{1,2})(?:[T ](\d{1,2}):(\d{2}))?$")
 +
 +
-+def month_of(ts):
++def parts(ts):
 +    m = TS.match(ts)
 +    if not m:
 +        raise ValueError(f"unrecognized timestamp: {ts!r}")
-+    return f"{int(m.group(1)):04d}-{int(m.group(2)):02d}"
++    g = [int(x) if x else 0 for x in m.groups()]
++    return tuple(g[:3]) + (g[3] if g[3] else 0, g[4])
 +
 +
 +def totals(path):
 +    kept = {}
 +    with open(path, newline="", encoding="utf-8") as fh:
 +        for row in csv.DictReader(fh):
-+            kept.setdefault((row["customer_id"], row["timestamp"]), row)
++            kept.setdefault((row["customer_id"], parts(row["timestamp"])), row)
 +    out = defaultdict(lambda: defaultdict(Decimal))
-+    for (cid, ts), row in kept.items():
-+        out[cid][month_of(ts)] += Decimal(row["amount"])
++    for (cid, ts_parts), row in kept.items():
++        out[cid][f"{ts_parts[0]:04d}-{ts_parts[1]:02d}"] += Decimal(row["amount"])
 +    return {
 +        cid: {m: float(v.quantize(Decimal("0.01"))) for m, v in months.items()}
 +        for cid, months in out.items()

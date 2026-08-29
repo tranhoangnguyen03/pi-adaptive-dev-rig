@@ -1,6 +1,6 @@
 diff --git a/totals.py b/totals.py
 new file mode 100644
-index 0000000..edf18c2
+index 0000000..3960888
 --- /dev/null
 +++ b/totals.py
 @@ -0,0 +1,37 @@
@@ -27,10 +27,10 @@ index 0000000..edf18c2
 +    latest = {}
 +    with open(path, newline="", encoding="utf-8") as fh:
 +        for row in csv.DictReader(fh):
-+            latest[(row["customer_id"], row["timestamp"])] = row["amount"]
++            latest[(row["customer_id"], parse_ts(row["timestamp"]))] = row["amount"]
 +    result = {}
-+    for (cid, ts), amount in latest.items():
-+        month = parse_ts(ts).strftime("%Y-%m")
++    for (cid, dt), amount in latest.items():
++        month = dt.strftime("%Y-%m")
 +        bucket = result.setdefault(cid, {})
 +        bucket[month] = bucket.get(month, Decimal("0")) + Decimal(amount)
 +    return {

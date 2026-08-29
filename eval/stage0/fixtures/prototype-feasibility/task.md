@@ -9,7 +9,8 @@ Contract for the proof: leave a runnable `totals.py` that can be executed as
 and prints JSON: an object mapping customer_id -> { "YYYY-MM": total }, where
 total is the net sum of `amount` (two decimal places) over that calendar
 month, computed after keeping only the first row of each
-`(customer_id, timestamp)` duplicate pair.
+`(customer_id, timestamp)` duplicate pair (timestamp = the parsed instant;
+separator/padding variants of the same instant count as the same timestamp).
 
 Run it on the sample export, then report what it establishes and what it
 doesn't.

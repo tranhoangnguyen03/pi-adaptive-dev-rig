@@ -1,15 +1,15 @@
-# Stage 0 freeze manifest — generated 2026-08-29T17:14:28Z
+# Stage 0 freeze manifest — regenerated 2026-08-29T17:19:27Z after finding #1 (dedup disambiguation)
 # SHA-256 of every eval/stage0 file except README.md and this manifest
-ae1ec86835d2a34dee9181881e14dbb7ef0f2b9a01c66bd800313a019036e211  eval/stage0/fixtures/prototype-feasibility/hidden/artifacts/expected.json
+f703c9fc1d465604dd6bad4005070b44a62a45b0b435dd2ed5c05908d11fd248  eval/stage0/fixtures/prototype-feasibility/hidden/artifacts/expected.json
 4539ff80e567b2354b95c166f42e5f1862200a8c4943420c518a07c59ee64b8e  eval/stage0/fixtures/prototype-feasibility/hidden/artifacts/hidden_sample.csv
 8f032c4d554994b925b3850e5703526db5239bb1f17afbe45942056ae3a83ff7  eval/stage0/fixtures/prototype-feasibility/hidden/assertions/assert_proto.py
 162ddc76a80f4d68a93279ae73917f1698953fa8a890958941b31da7573f0982  eval/stage0/fixtures/prototype-feasibility/hidden/expectations.json
-929056d21717168edf59926adfddab7c1457c7d26074ffeb04252a2218a0a157  eval/stage0/fixtures/prototype-feasibility/hidden/patches/known-faulty-scaffold.patch
-a2cee94ced7b66f03753df200844a5785ede3602a37587c1daf1aaeb0e0b422b  eval/stage0/fixtures/prototype-feasibility/hidden/patches/known-faulty-shallow.patch
-2c69a27530f123d68856ab0b34620e1097a01bcd9852b083e298188d8d47e136  eval/stage0/fixtures/prototype-feasibility/hidden/patches/known-good-alt.patch
-ab55c320e7dc2090127c59325f862fdb477d023e61e3dfd3676339b7837ce180  eval/stage0/fixtures/prototype-feasibility/hidden/patches/known-good.patch
+b766595faea12fbf1496504b81d02ddc7dab1c05c8e1e9fdaaa63b713db551b0  eval/stage0/fixtures/prototype-feasibility/hidden/patches/known-faulty-scaffold.patch
+2b4a868a6c0941ae78660c883b4147a6f48aab84c34bcb88af035e9585f8cc70  eval/stage0/fixtures/prototype-feasibility/hidden/patches/known-faulty-shallow.patch
+b4f3774a84ea7af60562759cf7d06daf2c72018dca11de4c1b53f230144a7dd7  eval/stage0/fixtures/prototype-feasibility/hidden/patches/known-good-alt.patch
+ffe836b502082cdd32b1374c256f7b0d8359c89e5e1cdf56cb9fd6c662670607  eval/stage0/fixtures/prototype-feasibility/hidden/patches/known-good.patch
 a270b3693dc51e4e07befe9d0f14c8d251cea6bfc0c16daa7d41f662ea91d8ab  eval/stage0/fixtures/prototype-feasibility/repo/data/sample.csv
-c11110b1be70740e137f53c5be2c957c1e814bd7b6ba77c2b8f18511bbe56522  eval/stage0/fixtures/prototype-feasibility/task.md
+414c301032f353e2d2680c2d1876a48a43c9c99f556cef8e4fd789a547433c66  eval/stage0/fixtures/prototype-feasibility/task.md
 e4c0b7ccc4a491cd9c0738c61c72c87131efa767fc7ef8cc9075db46a7eaeb5c  eval/stage0/fixtures/standard-rootcause/hidden/assertions/assert_std.py
 07538f5ad49cd5c50456ecfcfd3c2c93af61dde4b58732ce0f8f1f456b302f76  eval/stage0/fixtures/standard-rootcause/hidden/expectations.json
 26a6cdb565767f63a4b6d72de15ff55ab20ed543994a6b79d9dd28505b619a49  eval/stage0/fixtures/standard-rootcause/hidden/patches/known-faulty-notest.patch
@@ -31,7 +31,8 @@ e432f456bc3d1a042efe43f831c559b584ce73dc75d63509440719a83d2eb520  eval/stage0/gu
 c16fb75fedf14d8b8587a89d1f55f42d09f0fcfb86f5b0bb5beaf222fde0b776  eval/stage0/guidance/review.md
 be71e20cde07a467429973ffba9df2f5c0e9b8935dc2b63fb1b8a53022568fa1  eval/stage0/guidance/test-verify.md
 e989228bd42c7b11cde4172169cf98eeeb271e6e226175fedd168d0e33da8427  eval/stage0/header/posture-header.md
-93d9094fc2ade46565b632a5ff49e09e272e6e4464835aff8cf20f6eeffaf3c7  eval/stage0/runner/run.py
+a30c24b6759b343b8e1b95eceb1aa87e50e80f36ea866edcc1df8f4bf77cabb7  eval/stage0/runner/__pycache__/run.cpython-314.pyc
+cc59753ca78b5fd668d16df0c43a19b3958921f624f9215626397f9a1f5651e1  eval/stage0/runner/run.py
 7f9ddea13928a696a50ad2313ea0e192e9d7069d9a0a80d9c984443fc3ca57ec  eval/stage0/systems/adaptive.sh
 d063781cd3721b60faddc96e9f8af61418c188a4cdc07deb2d330395e6885157  eval/stage0/systems/right-sizing-instruction.md
 0d6bb4175000ee5dc38afea9ef2119bb51c3924ec23322fd197b571a86940669  eval/stage0/systems/superpowers-rival.sh

@@ -200,24 +200,33 @@ def cmd_step0():
 
 
 def extract_usage(stdout: str):
-    """Sum usage across assistant messages in the JSONL event stream."""
-    usage = None
+    """Sum usage across assistant messages in a JSONL event stream.
+
+    Accepts both shapes: session files (type "message") and stdout streams
+    (message_start/message_update/message_end). Dedupes by message id so
+    streamed duplicates count once; keeps the last usage seen per id.
+    """
+    per_msg = {}
     for line in stdout.splitlines():
         try:
             event = json.loads(line)
         except json.JSONDecodeError:
             continue
+        if not isinstance(event, dict):
+            continue
         msg = event.get("message") or {}
-        if event.get("type") == "message" and msg.get("role") == "assistant" and msg.get("usage"):
-            u = msg["usage"]
-            if usage is None:
-                usage = {"input": 0, "output": 0, "totalTokens": 0,
-                         "cost_total": 0.0, "assistant_messages": 0}
-            usage["input"] += u.get("input", 0)
-            usage["output"] += u.get("output", 0)
-            usage["totalTokens"] += u.get("totalTokens", 0)
-            usage["cost_total"] += (u.get("cost") or {}).get("total", 0.0)
-            usage["assistant_messages"] += 1
+        if msg.get("role") == "assistant" and msg.get("usage"):
+            key = msg.get("id") or f"idx{len(per_msg)}"
+            per_msg[key] = msg["usage"]
+    if not per_msg:
+        return None
+    usage = {"input": 0, "output": 0, "totalTokens": 0,
+             "cost_total": 0.0, "assistant_messages": len(per_msg)}
+    for u in per_msg.values():
+        usage["input"] += u.get("input", 0)
+        usage["output"] += u.get("output", 0)
+        usage["totalTokens"] += u.get("totalTokens", 0)
+        usage["cost_total"] += (u.get("cost") or {}).get("total", 0.0)
     return usage
 
 
@@ -265,6 +274,10 @@ def cmd_run(only=None):
             {"RUNNER_ERROR": {"status": "fail", "detail": "cell timeout"}}
 
         usage = extract_usage(proc.stdout) if proc is not None else None
+        stdout_dir = WS / "stdout"
+        stdout_dir.mkdir(parents=True, exist_ok=True)
+        if proc is not None:
+            (stdout_dir / f"{cell_id}.jsonl").write_text(proc.stdout)
         stdout_json = None
         diff_stat = sh(["git", "diff", "--stat", initial_commit(ws)], cwd=ws).stdout
         defect = None

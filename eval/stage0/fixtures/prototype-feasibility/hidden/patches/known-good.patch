@@ -1,6 +1,6 @@
 diff --git a/totals.py b/totals.py
 new file mode 100644
-index 0000000..0ad3cc9
+index 0000000..23f67ff
 --- /dev/null
 +++ b/totals.py
 @@ -0,0 +1,39 @@
@@ -28,7 +28,7 @@ index 0000000..0ad3cc9
 +    result = {}
 +    with open(path, newline="", encoding="utf-8") as fh:
 +        for row in csv.DictReader(fh):
-+            key = (row["customer_id"], row["timestamp"])
++            key = (row["customer_id"], parse_ts(row["timestamp"]))
 +            if key in seen:
 +                continue
 +            seen.add(key)

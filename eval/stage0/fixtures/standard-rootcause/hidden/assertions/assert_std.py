@@ -6,11 +6,15 @@ Preconditions: workspace is a git repo, initial commit = pristine fixture,
 copied into the workspace.
 
 H1 — sibling caller: hidden tests/test_export.py passes against the work.
-H2 — root-cause contract: hidden tests/test_windows_edges.py passes.
+H2 — root-cause contract stated by the issue: overnight windows parse
+      (22:00->06:00 = 8h) and 24:00-ending windows parse (20:00->24:00 = 4h).
+      Edges the issue does not determine (equal start/end, 00:00->24:00)
+      are deliberately NOT asserted — Stage 0 finding #2.
 H3 — regression protection: at least one new-or-modified file under tests/
       fails when lib/ is reverted to the pristine (buggy) version. Only
-      new/modified test files are considered, so the pre-existing failing
-      symptom test cannot mask the check.
+      new/modified .py test files are considered (no __pycache__), so the
+      pre-existing failing symptom test cannot mask the check and bytecode
+      noise cannot satisfy it.
 """
 import json
 import shutil
@@ -55,6 +59,7 @@ def check_h3(changed_files: list) -> dict:
     changed_tests = [
         f["path"] for f in changed_files
         if f["path"].startswith("tests/") and f.get("status") in ("A", "M")
+        and f["path"].endswith(".py") and "__pycache__" not in f["path"]
         and f["path"] != "tests/__init__.py"
     ]
     if not changed_tests:

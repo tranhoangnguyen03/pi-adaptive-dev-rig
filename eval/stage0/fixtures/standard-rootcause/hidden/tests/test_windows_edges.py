@@ -14,13 +14,11 @@ class TestWindowEdges(unittest.TestCase):
         start, end = parse_window("20:00", "24:00")
         self.assertEqual(end - start, timedelta(hours=4))
 
-    def test_full_day_from_midnight(self):
-        start, end = parse_window("00:00", "24:00")
-        self.assertEqual(end - start, timedelta(hours=24))
 
-    def test_equal_start_end_is_zero_length(self):
-        start, end = parse_window("09:00", "09:00")
-        self.assertEqual(end - start, timedelta(0))
+# Deliberately NOT asserted (underdetermined by issue #7 — Stage 0
+# finding #2): equal start/end semantics and 00:00->24:00 full-day windows.
+# Observed legitimate readings across systems: reject, zero-length, or
+# 24-hour window; all three are consistent with the stated requirements.
 
 
 if __name__ == "__main__":

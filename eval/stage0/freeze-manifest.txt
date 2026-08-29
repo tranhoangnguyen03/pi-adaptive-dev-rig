@@ -1,4 +1,4 @@
-# Stage 0 freeze manifest — regenerated 2026-08-29T17:19:27Z after finding #1 (dedup disambiguation)
+# Stage 0 freeze manifest — final, 2026-08-29T17:37:57Z
 # SHA-256 of every eval/stage0 file except README.md and this manifest
 f703c9fc1d465604dd6bad4005070b44a62a45b0b435dd2ed5c05908d11fd248  eval/stage0/fixtures/prototype-feasibility/hidden/artifacts/expected.json
 4539ff80e567b2354b95c166f42e5f1862200a8c4943420c518a07c59ee64b8e  eval/stage0/fixtures/prototype-feasibility/hidden/artifacts/hidden_sample.csv
@@ -10,14 +10,14 @@ b4f3774a84ea7af60562759cf7d06daf2c72018dca11de4c1b53f230144a7dd7  eval/stage0/fi
 ffe836b502082cdd32b1374c256f7b0d8359c89e5e1cdf56cb9fd6c662670607  eval/stage0/fixtures/prototype-feasibility/hidden/patches/known-good.patch
 a270b3693dc51e4e07befe9d0f14c8d251cea6bfc0c16daa7d41f662ea91d8ab  eval/stage0/fixtures/prototype-feasibility/repo/data/sample.csv
 414c301032f353e2d2680c2d1876a48a43c9c99f556cef8e4fd789a547433c66  eval/stage0/fixtures/prototype-feasibility/task.md
-e4c0b7ccc4a491cd9c0738c61c72c87131efa767fc7ef8cc9075db46a7eaeb5c  eval/stage0/fixtures/standard-rootcause/hidden/assertions/assert_std.py
+006ccd32af0f5346491c5e9a7eafb5fac0b773303447de8e3a77803a08efd81c  eval/stage0/fixtures/standard-rootcause/hidden/assertions/assert_std.py
 07538f5ad49cd5c50456ecfcfd3c2c93af61dde4b58732ce0f8f1f456b302f76  eval/stage0/fixtures/standard-rootcause/hidden/expectations.json
 26a6cdb565767f63a4b6d72de15ff55ab20ed543994a6b79d9dd28505b619a49  eval/stage0/fixtures/standard-rootcause/hidden/patches/known-faulty-notest.patch
 a9866e476cc82a7624ec6194afc994c54e1a1797292f2da19c191775b0bd70d7  eval/stage0/fixtures/standard-rootcause/hidden/patches/known-faulty-symptom.patch
 8c2cd1ce916223ce3a0cbb9edcbcb00cd98099d1e88db7566c8be850bdee257a  eval/stage0/fixtures/standard-rootcause/hidden/patches/known-good-alt.patch
 d7a952d17289cf89a026d623d794db072cba7d3fec151369b3ca3399b70bfd1f  eval/stage0/fixtures/standard-rootcause/hidden/patches/known-good.patch
 8e3b5e45f4949c0fc3dd2a78df297eb7c4978db5d862e90adc5bbd2c5f80f5d2  eval/stage0/fixtures/standard-rootcause/hidden/tests/test_export.py
-cd0f1a2ee3c880cdcd9039d7845abf259bfa9d94871bc94263a60327737a8e9e  eval/stage0/fixtures/standard-rootcause/hidden/tests/test_windows_edges.py
+ad552eae5f24cc9f99653db0e25faac94cce64d1f01e609b8748b2893347411c  eval/stage0/fixtures/standard-rootcause/hidden/tests/test_windows_edges.py
 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  eval/stage0/fixtures/standard-rootcause/repo/commands/__init__.py
 5fbbe83e9cde2950e74859971d216ec9536229670d9c62ceedac9821753c05a5  eval/stage0/fixtures/standard-rootcause/repo/commands/export.py
 2cc039108635e3ac5093acab14400287db7979679ec9b0a74c021039d40d97ba  eval/stage0/fixtures/standard-rootcause/repo/commands/list.py

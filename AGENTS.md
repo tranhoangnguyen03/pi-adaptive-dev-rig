@@ -29,6 +29,6 @@ Read completely, in order:
 
 ## Before implementation
 
-The next session should implement only the Stage 0 evaluation materials described in `docs/EVALUATION.md`. A product implementation plan, persistent runtime state, or broad capability port waits for Stage 0/1 evidence.
+The next session should implement only the Stage 0 readiness-gate materials described in `docs/EVALUATION.md` §3 and `docs/DECISIONS.md` D-014. A product implementation plan, persistent runtime state, or broad capability port waits for Stage 0/1 evidence.
 
 Do not commit, publish, or modify external repositories without explicit user direction.

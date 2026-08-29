@@ -63,4 +63,4 @@ Apache-2.0 — see [LICENSE](LICENSE).
 
 ## Immediate next step
 
-Run the Stage 0 readiness gate in `docs/EVALUATION.md` — non-evidentiary preparation for Stage 1 — then run the Stage 1 pilot to decide whether the guidance architecture deserves a larger validation program. Do not build the delivery kernel or port the full Pi-superpowers skill suite upfront.
+Stage 0 is complete and frozen (`eval/stage0/README.md`). Run the Stage 1 pilot per `docs/EVALUATION.md` §3 to decide whether the guidance architecture deserves a larger validation program; entry conditions and the Stage 1 handoff are recorded in `eval/stage0/README.md`. Do not build the delivery kernel or port the full Pi-superpowers skill suite upfront.

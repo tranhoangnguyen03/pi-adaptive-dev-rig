@@ -29,6 +29,6 @@ Read completely, in order:
 
 ## Before implementation
 
-The next session should implement only the Stage 0 readiness-gate materials described in `docs/EVALUATION.md` §3 and `docs/DECISIONS.md` D-014. A product implementation plan, persistent runtime state, or broad capability port waits for Stage 0/1 evidence.
+Stage 0 is complete (2026-08-30; see the completion record on D-014 and `eval/stage0/README.md`). The next implementable work is the Stage 1 pilot described in `docs/EVALUATION.md` §3 — read the "Stage 1 handoff" section in `eval/stage0/README.md` first. Stage 1 margins are owner-approved and recorded in `docs/EVALUATION.md` §6; do not tune them after seeing outcomes. A product implementation plan, persistent runtime state, or broad capability port still waits for Stage 1 evidence.
 
 Do not commit, publish, or modify external repositories without explicit user direction.

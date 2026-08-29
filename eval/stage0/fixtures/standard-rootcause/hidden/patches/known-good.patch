@@ -1,0 +1,69 @@
+diff --git a/lib/windows.py b/lib/windows.py
+index 052f764..38f37d5 100644
+--- a/lib/windows.py
++++ b/lib/windows.py
+@@ -1,11 +1,16 @@
+ """Time-window parsing shared by the list and export commands."""
+-from datetime import datetime
++from datetime import datetime, timedelta
+ 
+ FORMATS = ("%H:%M",)
+ 
+ 
+ def parse_time(value):
+-    """Parse an "HH:MM" time string into a datetime."""
++    """Parse an "HH:MM" time string into a datetime.
++
++    "24:00" denotes the end of the day: midnight at the start of the next day.
++    """
++    if value == "24:00":
++        return datetime.strptime("00:00", "%H:%M") + timedelta(days=1)
+     for fmt in FORMATS:
+         try:
+             return datetime.strptime(value, fmt)
+@@ -15,9 +20,13 @@ def parse_time(value):
+ 
+ 
+ def parse_window(start, end):
+-    """Return (start_dt, end_dt) for a window on the reference day."""
++    """Return (start_dt, end_dt) for a window.
++
++    An end time earlier than the start time crosses midnight into the next
++    day. Equal start and end denote a zero-length window on the same day.
++    """
+     start_dt = parse_time(start)
+     end_dt = parse_time(end)
+-    if end_dt <= start_dt:
+-        raise ValueError("invalid window: end must be after start")
++    if end_dt < start_dt:
++        end_dt += timedelta(days=1)
+     return start_dt, end_dt
+diff --git a/tests/test_windows_regression.py b/tests/test_windows_regression.py
+new file mode 100644
+index 0000000..41713ad
+--- /dev/null
++++ b/tests/test_windows_regression.py
+@@ -0,0 +1,23 @@
++"""Regression protection for overnight and end-of-day windows."""
++import unittest
++from datetime import timedelta
++
++from commands.export import export_rows
++from lib.windows import parse_window
++
++
++class TestRegression(unittest.TestCase):
++    def test_overnight_window_parses(self):
++        start, end = parse_window("22:00", "06:00")
++        self.assertEqual(end - start, timedelta(hours=8))
++
++    def test_end_of_day_window_parses(self):
++        start, end = parse_window("20:00", "24:00")
++        self.assertEqual(end - start, timedelta(hours=4))
++
++    def test_export_keeps_overnight_rows(self):
++        self.assertEqual(len(export_rows([("reindex", "22:00", "06:00")])), 1)
++
++
++if __name__ == "__main__":
++    unittest.main()

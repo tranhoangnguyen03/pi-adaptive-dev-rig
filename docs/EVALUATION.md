@@ -154,6 +154,8 @@ Seeded risks:
 
 Before Stage 1, replace provisional margins with owner-approved values and record them here; do not tune them after seeing Stage 1 outcomes. Stage 0 produces no data for these rules.
 
+> **Owner approval recorded 2026-08-30:** the provisional values below are adopted **verbatim** as the owner-approved Stage 1 margins — including H1's "no new universal-protection violation or unsupported completion claim" clause and H5's "no worse protection record" condition. The owner delegated the decision to a three-reviewer council (codex, antigravity, claude); the decision was unanimous and no margin value was derived from Stage 0 data.
+
 ### H1 — Prototype
 
 Primary endpoint: hidden named-criterion success.

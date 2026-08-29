@@ -1,0 +1,43 @@
+diff --git a/totals.py b/totals.py
+new file mode 100644
+index 0000000..3960888
+--- /dev/null
++++ b/totals.py
+@@ -0,0 +1,37 @@
++"""Monthly per-customer net totals (subtly wrong: re-sends keep the LAST row)."""
++import csv
++import json
++import sys
++from datetime import datetime
++from decimal import Decimal
++
++FORMATS = ("%Y-%m-%dT%H:%M", "%Y-%m-%d %H:%M", "%Y-%m-%d")
++
++
++def parse_ts(value):
++    for fmt in FORMATS:
++        try:
++            return datetime.strptime(value, fmt)
++        except ValueError:
++            continue
++    raise ValueError(f"unrecognized timestamp: {value!r}")
++
++
++def totals(path):
++    latest = {}
++    with open(path, newline="", encoding="utf-8") as fh:
++        for row in csv.DictReader(fh):
++            latest[(row["customer_id"], parse_ts(row["timestamp"]))] = row["amount"]
++    result = {}
++    for (cid, dt), amount in latest.items():
++        month = dt.strftime("%Y-%m")
++        bucket = result.setdefault(cid, {})
++        bucket[month] = bucket.get(month, Decimal("0")) + Decimal(amount)
++    return {
++        cid: {m: float(t.quantize(Decimal("0.01"))) for m, t in months.items()}
++        for cid, months in result.items()
++    }
++
++
++if __name__ == "__main__":
++    print(json.dumps(totals(sys.argv[1]), sort_keys=True, indent=2))

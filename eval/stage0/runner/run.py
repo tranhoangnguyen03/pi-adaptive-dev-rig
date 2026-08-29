@@ -78,7 +78,7 @@ def changed_files(ws: Path) -> list:
 def run_assertions(fixture: str, ws: Path, changed: list) -> dict:
     hidden = FIXTURES / fixture / "hidden"
     script = next((hidden / "assertions").glob("assert_*.py"))
-    proc = sh([sys.executable, str(script), str(hidden)], cwd=ws,
+    proc = sh([sys.executable, str(script), str(hidden), str(ws)], cwd=ws,
               timeout=300, input_text=json.dumps(changed))
     if proc.returncode != 0:
         return {"RUNNER_ERROR": {"status": "fail",
@@ -215,9 +215,18 @@ def extract_usage(stdout: str):
         if not isinstance(event, dict):
             continue
         msg = event.get("message") or {}
-        if msg.get("role") == "assistant" and msg.get("usage"):
-            key = msg.get("id") or f"idx{len(per_msg)}"
-            per_msg[key] = msg["usage"]
+        if msg.get("role") != "assistant" or not msg.get("usage"):
+            continue
+        mid = msg.get("id") or event.get("id")
+        if mid:
+            # Id-bearing streams (session files, final events): keep the
+            # last usage per real message id.
+            per_msg[mid] = msg["usage"]
+        elif event.get("type") == "message_end":
+            # Id-less streamed stdout: only terminal events count, so a
+            # message streamed as start/update/end is counted exactly once
+            # (remediation round 2, council finding #6).
+            per_msg[f"end{len(per_msg)}"] = msg["usage"]
     if not per_msg:
         return None
     usage = {"input": 0, "output": 0, "totalTokens": 0,

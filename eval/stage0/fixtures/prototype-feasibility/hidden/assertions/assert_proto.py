@@ -39,6 +39,11 @@ def check_a1(hidden_dir: Path) -> dict:
         got = json.loads(proc.stdout)
     except json.JSONDecodeError as exc:
         return {"A1": ("fail", f"stdout is not JSON: {exc}")}
+    if not isinstance(got, dict) or not all(
+        isinstance(v, dict) and all(isinstance(x, (int, float)) for x in v.values())
+        for v in got.values()
+    ):
+        return {"A1": ("fail", "output is not customer_id -> {month: number} JSON")}
     expected = json.loads((hidden_dir / "artifacts" / "expected.json").read_text())
 
     def norm(tree):

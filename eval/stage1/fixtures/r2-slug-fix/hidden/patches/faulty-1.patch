@@ -1,0 +1,46 @@
+diff --git a/src/links.js b/src/links.js
+index 0f9b268..e197234 100644
+--- a/src/links.js
++++ b/src/links.js
+@@ -1,8 +1,8 @@
+-// Caller 1: tag routes from titles (uses the shared slug helper).
++// Caller 1 — masks slug boundaries locally (symptom patch, #90 NOT fixed).
+ import { slugify } from "./slug.js";
+ 
+ export function tagMap(titles) {
+   const map = new Map();
+-  for (const t of titles) map.set(`tag:${slugify(t)}`, t);
++  for (const t of titles) map.set(`tag:${slugify(t).replace(/^-+|-+$/g, "")}`, t);
+   return map;
+ }
+diff --git a/tests/regress.test.js b/tests/regress.test.js
+new file mode 100644
+index 0000000..5679125
+--- /dev/null
++++ b/tests/regress.test.js
+@@ -0,0 +1,25 @@
++import test from "node:test";
++import assert from "node:assert/strict";
++import { slugify } from "../src/slug.js";
++import { tagMap } from "../src/links.js";
++import { slugReport } from "../src/report.js";
++
++test("regression #90: no boundary hyphens survive", () => {
++  for (const t of [" -- leading -- ", "trailing --", " -- ", "-x-"]) {
++    const s = slugify(t);
++    assert.ok(!s.startsWith("-") && !s.endsWith("-"), `${s} has boundary hyphens`);
++  }
++});
++
++test("regression #90: tag map loses no entries to boundary variants", () => {
++  const titles = ["  Hello, World!  ", "Don't Stop", " -- leading -- "];
++  const m = tagMap(titles);
++  assert.equal(m.size, 3);
++  assert.deepEqual([...m.keys()].sort(),
++                   ["tag:dont-stop", "tag:hello-world", "tag:leading"]);
++});
++
++test("regression #90: report stays boundary-clean", () => {
++  assert.deepEqual(slugReport([" -- leading -- ", "trailing --"]),
++                   ["leading", "trailing"]);
++});

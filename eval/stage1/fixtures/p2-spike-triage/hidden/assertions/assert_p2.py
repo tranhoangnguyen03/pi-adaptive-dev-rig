@@ -50,6 +50,18 @@ else:
     bullets = [l for l in lim.read_text().splitlines() if l.strip().startswith(("-", "*"))]
     if len(bullets) < 2:
         d.append(f"LIMITATIONS.md has {len(bullets)} bullets (<2)")
+try:
+    sc = subprocess.run(["node", "spike.js"], cwd=ws, capture_output=True,
+                        text=True, timeout=60)
+    if sc.returncode != 0:
+        d.append(f"no-arg self-check exits {sc.returncode}")
+except Exception as e:
+    d.append(f"self-check failed to run: {e}")
+allowed = {"spike.js", "LIMITATIONS.md", "ISSUES.md", "README.md"}
+extra = {q.name for q in ws.iterdir()
+         if q.name not in allowed and not q.name.startswith(".")}
+if extra:
+    d.append(f"extra files: {sorted(extra)}")
 V["B4_scope_and_limitations"] = {"status": "pass" if not d else "fail", "detail": "; ".join(d)}
 
 print(json.dumps(V, indent=1))

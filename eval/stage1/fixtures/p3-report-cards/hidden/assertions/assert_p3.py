@@ -82,8 +82,9 @@ try:
     d = []
     if sum_input not in raw and sum_sorted not in raw:
         d.append(f"sum {sum_input}/{sum_sorted} not found")
-    if str(len(included)) not in raw:
-        d.append(f"count {len(included)} not found")
+    n = len(included)
+    if not re.search(rf"(?<![\d.]){n}(?![\d.])", raw):
+        d.append(f"count {n} not present as a standalone number")
     V["C2_totals"] = {"status": "pass" if not d else "fail", "detail": "; ".join(d)}
 
     d = []
@@ -94,8 +95,9 @@ try:
     if pys - {"build_report.py", ".grader_report.html"}:
         d.append(f"extra .py files: {sorted(pys)}")
     src = (ws / "build_report.py").read_text()
+    import sys as _sys
     bad = [i for i in re.findall(r"^\s*(?:import|from)\s+([\w.]+)", src, re.M)
-           if i.split(".")[0] not in ("json", "sys", "os", "re", "argparse", "html", "math", "collections")]
+           if i.split(".")[0] not in _sys.stdlib_module_names]
     if bad: d.append(f"non-stdlib imports: {bad}")
     V["C4_scope"] = {"status": "pass" if not d else "fail", "detail": "; ".join(d)}
 except Exception as e:

@@ -42,10 +42,14 @@ SEED = 20260830
 CORE_TIMEOUT_S = 25 * 60
 UX_TIMEOUT_S = 15 * 60
 DIAG_RERUN_CAP = 6
+CEILING_COST_USD = 200.0     # council r1 #5/#7: enforced, not documentary
+CEILING_INVOCATIONS = 102
+CEILING_WALL_S = 10 * 3600
+FOLLOWUP_CEILING_USD = 40.0
 
 SCORED = ["p1-vendor-client", "p2-spike-triage", "p3-report-cards",
           "s1-review-debt", "s2-promote-prototype", "s3-booking-feature"]
-RESERVE = ["r1-parity-kv", "r2-cursor-fix"]  # sealed — never scheduled
+RESERVE = ["r1-parity-kv", "r2-slug-fix"]  # sealed — never scheduled
 ARMS = ["unaided", "superpowers", "superpowers-instruction", "adaptive"]
 REPEATS = 3
 UX_GRID = [("ux1", "blocking"), ("ux1", "optimistic"),
@@ -78,19 +82,23 @@ def initial_commit(ws: Path) -> str:
     return sh(["git", "rev-list", "--max-parents=0", "HEAD"], cwd=ws).stdout.strip()
 
 
+NOISE = (".pyc", "__pycache__")
+
+
 def changed_files(ws: Path) -> list:
     sh(["git", "add", "-A"], cwd=ws)
     out = sh(["git", "diff", "--name-status", initial_commit(ws)], cwd=ws).stdout
     files = []
     for line in out.splitlines():
         parts = line.split("\t")
-        if len(parts) == 2:
+        if len(parts) == 2 and not any(n in parts[1] for n in NOISE):
             files.append({"status": parts[0][:1], "path": parts[1]})
     return files
 
 
 def diff_text(ws: Path) -> str:
-    return sh(["git", "diff", initial_commit(ws)], cwd=ws).stdout
+    return sh(["git", "diff", initial_commit(ws), "--", ":!*.pyc",
+               ":!**/__pycache__/**"], cwd=ws).stdout
 
 
 def run_assertions(fixture: str, ws: Path, changed: list) -> dict:
@@ -143,8 +151,11 @@ def extract_usage(stdout: str):
 
 
 def session_usage_total(session_dir: Path) -> int:
-    """Cross-check total tokens from the persisted session files."""
-    total = 0
+    """Cross-check total tokens from the persisted session files.
+
+    Id-deduped exactly like extract_usage (council r1 #7: the gate must
+    not re-introduce the Stage 0 double-count bug)."""
+    per_msg = {}
     for f in session_dir.rglob("*.jsonl"):
         for line in f.read_text().splitlines():
             try:
@@ -152,9 +163,14 @@ def session_usage_total(session_dir: Path) -> int:
             except json.JSONDecodeError:
                 continue
             m = e.get("message") or {}
-            if m.get("role") == "assistant" and m.get("usage"):
-                total += m["usage"].get("totalTokens", 0)
-    return total
+            if m.get("role") != "assistant" or not m.get("usage"):
+                continue
+            mid = m.get("id") or e.get("id")
+            if mid:
+                per_msg[mid] = m["usage"]
+            elif e.get("type") == "message_end":
+                per_msg[f"end{len(per_msg)}"] = m["usage"]
+    return sum(u.get("totalTokens", 0) for u in per_msg.values())
 
 
 # ----------------------------------------------------------------- validate
@@ -217,34 +233,39 @@ def build_prompts() -> dict:
     return bodies
 
 
+def canonical_schedule_hash(doc_without_sha):
+    blob = json.dumps(doc_without_sha, indent=1, sort_keys=False)
+    return hashlib.sha256(blob.encode()).hexdigest()
+
+
 def cmd_schedule(force=False):
     sched_path = WS / "schedule.json"
+    if force and any((WS / "results").glob("*.json")) if (WS / "results").exists() else False:
+        print("refusing --force: recorded results exist (immutability guard)")
+        return 1
     if sched_path.exists() and not force:
         print(f"schedule exists ({sched_path}); refusing to overwrite without --force")
         return 1
     WS.mkdir(parents=True, exist_ok=True)
     rng = random.Random(SEED)
     cells = []
-    anon = 0
     for rep in range(1, REPEATS + 1):          # balanced interleaved rounds
-        round_cells = []
-        for f in SCORED:
-            for arm in ARMS:
-                anon += 1
-                round_cells.append({"anon": f"c{anon:03d}", "kind": "core",
-                                    "fixture": f, "system": arm,
-                                    "repeat": rep, "round": rep})
-        rng.shuffle(round_cells)
+        round_cells = [{"kind": "core", "fixture": f, "system": arm,
+                        "repeat": rep, "round": rep}
+                       for f in SCORED for arm in ARMS]
+        rng.shuffle(round_cells)               # execution order
         cells.extend(round_cells)
-    ux_cells = []
-    for i in range(REPEATS):
-        for name, mode in UX_GRID:
-            anon += 1
-            ux_cells.append({"anon": f"c{anon:03d}", "kind": "ux",
-                             "fixture": f"ux-{name}", "system": "adaptive",
-                             "mode": mode, "repeat": i + 1, "round": 3 + i + 1})
+    ux_cells = [{"kind": "ux", "fixture": f"ux-{name}", "system": "adaptive",
+                 "mode": mode, "repeat": i + 1, "round": 3 + i + 1}
+                for i in range(REPEATS) for name, mode in UX_GRID]
     rng.shuffle(ux_cells)
     cells.extend(ux_cells)
+    # Opaque IDs: assign the ID pool by an INDEPENDENT shuffle so no cell's
+    # ID encodes fixture/arm/repeat/position (council: ID de-anonymization).
+    id_pool = [f"c{i:03d}" for i in range(1, len(cells) + 1)]
+    rng.shuffle(id_pool)
+    for cell, anon in zip(cells, id_pool):
+        cell["anon"] = anon
 
     bodies = build_prompts()
     prompts = WS / "prompts"
@@ -258,9 +279,8 @@ def cmd_schedule(force=False):
         pf.write_text(body)
 
     anon_map = {c["anon"]: {k: v for k, v in c.items() if k != "anon"} for c in cells}
-    blob = json.dumps({"seed": SEED, "cells": cells,
-                       "sha256": None}, indent=1, sort_keys=False)
-    digest = hashlib.sha256(blob.encode()).hexdigest()
+    digest = canonical_schedule_hash({"seed": SEED, "cell_count": len(cells),
+                                      "cells": cells})
     doc = {"seed": SEED, "cell_count": len(cells), "sha256": digest, "cells": cells}
     sched_path.write_text(json.dumps(doc, indent=1))
     # identity table stays workspace-side (graders see only anon IDs)
@@ -332,12 +352,19 @@ def cmd_probes():
     results["stage0_manifest"] = {"verified": proc.returncode == 0}
     clone = WS / "superpowers"
     results["superpowers_pin_present"] = bool((clone / "skills").is_dir())
+    pin = "efe1d158691bf064c24f0460fd4e46ca58de0055"
+    got = sh(["git", "rev-parse", "HEAD"], cwd=clone).stdout.strip()
+    results["superpowers_commit"] = {"expected": pin, "got": got,
+                                     "ok": got == pin}
+    results["superpowers_pin_present"] = (results["superpowers_pin_present"]
+                                          and got == pin)
     out = WS / "probes.json"
     out.write_text(json.dumps(results, indent=1))
     print(json.dumps({k: v for k, v in results.items()
                       if k in ("symmetry", "stage0_manifest", "superpowers_pin_present")}, indent=1))
     return 0 if all([identical, b1 != b2, proc.returncode == 0,
-                     results["superpowers_pin_present"]]) else 1
+                     results["superpowers_pin_present"],
+                     results["superpowers_commit"]["ok"]]) else 1
 
 
 # ----------------------------------------------------------------- run
@@ -406,24 +433,36 @@ def execute_cell(c: dict, results: Path, rerun_ledger: list) -> None:
            "STAGE1_WS": str(ws), "STAGE1_PROMPT": str(prompt_file)}
     timeout = UX_TIMEOUT_S if c["kind"] == "ux" else CORE_TIMEOUT_S
     started = time.time()
-    proc, timed_out, stderr_tail = None, False, ""
+    proc, timed_out, stderr_tail, partial_stdout = None, False, "", ""
     try:
         proc = sh(["bash", str(script), str(ws), str(prompt_file)],
                   cwd=ws, timeout=timeout, env=env)
     except subprocess.TimeoutExpired as exc:
         timed_out = True
-        stderr_tail = (exc.stderr or b"").decode()[-800:] if exc.stderr else ""
+        raw = exc.stdout
+        partial_stdout = (raw.decode(errors="replace") if isinstance(raw, bytes)
+                          else (raw or ""))
+        raw_err = exc.stderr
+        stderr_tail = ((raw_err.decode(errors="replace") if isinstance(raw_err, bytes)
+                        else (raw_err or ""))[-800:])
     wall_s = round(time.time() - started, 1)
 
     usage = extract_usage(proc.stdout) if proc is not None else None
     ux_flow = None
 
     def resume(msg, tag):
+        """Continue the SAME session with the SAME pinned arm invocation
+        (treatment must be identical on every turn)."""
+        sess_files = sorted(session_dir.rglob("*.jsonl"), key=lambda f: f.stat().st_mtime)
+        if not sess_files:
+            return {"msg": msg, "error": "no session file to resume"}
+        base_cmd = arm_command(c["system"], ws, prompt_file, session_dir,
+                               f"{c['anon']}-{tag}")
+        sep = base_cmd.index("--")
+        cmd = base_cmd[:sep] + ["--session", str(sess_files[-1])] + base_cmd[sep:]
+        cmd[cmd.index("--") + 1] = msg
         t0 = time.time()
-        pr = sh(["pi", "-p", "--session", c["anon"], "--session-dir",
-                 str(session_dir), "--mode", "json", "--name",
-                 f"{c['anon']}-{tag}", "--", msg],
-                cwd=ws, timeout=UX_TIMEOUT_S, env=env)
+        pr = sh(cmd, cwd=ws, timeout=UX_TIMEOUT_S, env=env)
         (WS / "stdout" / f"{c['anon']}-{tag}.jsonl").write_text(pr.stdout)
         return {"msg": msg, "wall_s": round(time.time() - t0, 1),
                 "usage": extract_usage(pr.stdout),
@@ -433,24 +472,29 @@ def execute_cell(c: dict, results: Path, rerun_ledger: list) -> None:
         expected = "Prototype" if c["fixture"] == "ux-ux1" else "Standard"
         declared = declared_posture(proc.stdout)
         turns = []
+        pre_correction_files = None
         if c["mode"] == "blocking":
             turns.append(resume("Yes, proceed.", "t2"))          # scripted proceed
             wrong = declared is not None and declared != expected
             if wrong:
+                pre_correction_files = changed_files(ws)   # wasted-work snapshot
                 turns.append(resume(f"Actually — deliver this as {expected} "
                                     f"posture. Redo the work from the current state.",
                                     "t3"))
             ux_flow = {"mode": "blocking", "declared": declared,
                        "expected": expected, "correction_sent": wrong,
+                       "pre_correction_files": pre_correction_files,
                        "turns": turns}
         else:
             wrong = declared is not None and declared != expected
             if wrong:
+                pre_correction_files = changed_files(ws)   # wasted-work snapshot
                 turns.append(resume(f"Actually — deliver this as {expected} "
                                     f"posture. Redo the work from the current state.",
                                     "t2"))
             ux_flow = {"mode": "optimistic", "declared": declared,
                        "expected": expected, "correction_sent": wrong,
+                       "pre_correction_files": pre_correction_files,
                        "turns": turns}
         if turns:
             merged = dict(usage or {})
@@ -459,22 +503,36 @@ def execute_cell(c: dict, results: Path, rerun_ledger: list) -> None:
                     merged[k] = merged.get(k, 0) + v
             usage = merged or None
 
-    changed = changed_files(ws) if not timed_out else []
+    changed = changed_files(ws)                       # after-work timeouts
+    work_happened = bool(changed)                     # ARE graded (council r1)
     verdict = (run_assertions(c["fixture"], ws, changed)
-               if c["kind"] == "core" and not timed_out else
+               if c["kind"] == "core" else
                {"UX": {"status": "n/a", "detail": "graded by coder, not mechanically"}})
     stdout_dir = WS / "stdout"
     stdout_dir.mkdir(parents=True, exist_ok=True)
     if proc is not None:
         (stdout_dir / f"{c['anon']}.jsonl").write_text(proc.stdout)
+    elif partial_stdout:
+        (stdout_dir / f"{c['anon']}.jsonl").write_text(partial_stdout)
     defect = None
-    if timed_out:
-        defect = "timeout"
+    if timed_out and not work_happened:
+        defect = "timeout-before-work"                # rerun-eligible
+    elif timed_out:
+        defect = "timeout-after-work"                 # graded, flagged
     elif proc is None or proc.returncode != 0:
         defect = "nonzero-exit"
     elif "RUNNER_ERROR" in verdict:
         defect = "assertion-harness"
+    # telemetry gate (fail-closed): sum all invocation stdouts vs session
     cross = session_usage_total(session_dir)
+    stdout_sum = 0
+    for sf in list(stdout_dir.glob(f"{c['anon']}*.jsonl")):
+        u = extract_usage(sf.read_text())
+        stdout_sum += (u or {}).get("totalTokens", 0)
+    stdout_total = (usage or {}).get("totalTokens", 0) if proc is not None else None
+    telemetry_ok = (stdout_sum == cross) if cross or stdout_sum else True
+    if not telemetry_ok:
+        defect = defect or "telemetry-mismatch"
     result = {
         "cell": c["anon"], "kind": c["kind"], "fixture": c["fixture"],
         "system": c["system"], "repeat": c["repeat"], "round": c["round"],
@@ -483,6 +541,8 @@ def execute_cell(c: dict, results: Path, rerun_ledger: list) -> None:
         "exit_code": None if proc is None else proc.returncode,
         "defect_class": defect,
         "usage": usage, "session_tokens_crosscheck": cross,
+        "telemetry_ok": telemetry_ok,
+        "prompt_sha": c.get("prompt_sha"),
         "usage_note": "stdout totalTokens should equal crosscheck "
                       "(council #6 gate; ux cells sum both turns)",
         "changed_files": changed,
@@ -492,10 +552,50 @@ def execute_cell(c: dict, results: Path, rerun_ledger: list) -> None:
         "rerun_ledger": rerun_ledger,
     }
     result_path.write_text(json.dumps(result, indent=1))
+    led = load_ledger()
+    led["cost_total"] = round(led["cost_total"] + (usage or {}).get("cost_total", 0.0), 4)
+    led["invocations"] += 1 + len((ux_flow or {}).get("turns") or [])
+    led["wall_s"] = round(led["wall_s"] + wall_s, 1)
+    if c.get("kind") == "followup":
+        led["followup_cost"] = round(led["followup_cost"] + (usage or {}).get("cost_total", 0.0), 4)
+    (WS / "ledger.json").write_text(json.dumps(led, indent=1))
     summary = ", ".join(f"{k}={v['status']}" for k, v in verdict.items())
     print(f"[{c['anon']}] {c['fixture']}/{c['system']}"
           f"{'' if c['kind'] == 'core' else '/' + c['mode']}"
           f" wall={wall_s}s defect={defect} {summary}")
+
+
+def load_ledger() -> dict:
+    lp = WS / "ledger.json"
+    return json.loads(lp.read_text()) if lp.exists() else         {"cost_total": 0.0, "invocations": 0, "wall_s": 0.0, "followup_cost": 0.0}
+
+
+def preflight_caps(n_new_cells: int) -> str | None:
+    led = load_ledger()
+    if led["cost_total"] >= CEILING_COST_USD:
+        return f"cost ceiling reached: ${led['cost_total']:.2f}"
+    if led["invocations"] + n_new_cells > CEILING_INVOCATIONS:
+        return f"invocation ceiling would be exceeded ({led['invocations']}+{n_new_cells}>{CEILING_INVOCATIONS})"
+    if led["wall_s"] >= CEILING_WALL_S:
+        return f"wall-clock ceiling reached: {led['wall_s']:.0f}s"
+    return None
+
+
+def preflight_freezes() -> str | None:
+    for manifest, cwd in ((STAGE0 / "freeze-manifest.txt", REPO_ROOT),
+                          (STAGE1 / "freeze-manifest.txt", REPO_ROOT)):
+        if manifest.exists() and sh(["shasum", "-a", "256", "-c", manifest.name],
+                                    cwd=manifest.parent).returncode != 0:
+            return f"manifest check failed: {manifest}"
+    doc = load_schedule()
+    recomputed = canonical_schedule_hash({k: v for k, v in doc.items() if k != "sha256"})
+    if recomputed != doc.get("sha256"):
+        return "schedule self-hash mismatch"
+    for c in doc["cells"]:
+        pf = WS / "prompts" / f"{c['anon']}.md"
+        if not pf.exists() or hashlib.sha256(pf.read_text().encode()).hexdigest() != c["prompt_sha"]:
+            return f"prompt hash mismatch: {c['anon']}"
+    return None
 
 
 def cmd_run(args):
@@ -503,6 +603,10 @@ def cmd_run(args):
         print("no schedule — run `schedule` first")
         return 1
     sched = load_schedule()
+    blocker = preflight_freezes()
+    if blocker and args[:1] not in (["--retry"],):
+        print(f"PREFLIGHT BLOCKED: {blocker}")
+        return 1
     cells = sched["cells"]
     results = WS / "results"
     results.mkdir(parents=True, exist_ok=True)
@@ -525,21 +629,57 @@ def cmd_run(args):
         allowed = ("runner-crash", "nonzero-exit", "provider-failure",
                    "timeout-before-work", "harness-bug", "workspace-prep",
                    "schedule-defect")
-        if reason.split()[0] not in allowed:
+        code = reason.split()[0]
+        if code not in allowed:
             print(f"reason must start with one of {allowed}")
             return 2
         if len(rerun_ledger) >= DIAG_RERUN_CAP:
             print(f"diagnostic rerun cap ({DIAG_RERUN_CAP}) reached")
             return 2
+        # Evidence check (council: no honor-system reruns). attempt-1 must
+        # actually exhibit the claimed defect.
         target = results / f"{anon}.json"
+        prior = None
         if target.exists():
-            target.rename(target.with_suffix(".json.attempt1"))
-        rerun_ledger.append({"cell": anon, "reason": reason,
+            prior = json.loads(target.read_text())
+        elif (results / f"{anon}.json.attempt1").exists():
+            prior = json.loads((results / f"{anon}.json.attempt1").read_text())
+        ev_ok, ev_msg = True, "no prior result (runner died before recording)"
+        if prior is not None:
+            if code == "nonzero-exit":
+                ev_ok = prior.get("exit_code") not in (0, None)
+                ev_msg = f"exit_code={prior.get('exit_code')}"
+            elif code == "timeout-before-work":
+                ev_ok = prior.get("timeout") and not prior.get("changed_files")
+                ev_msg = f"timeout={prior.get('timeout')} changed={len(prior.get('changed_files') or [])}"
+            elif code == "harness-bug":
+                ev_ok = "RUNNER_ERROR" in (prior.get("assertions") or {})
+                ev_msg = "assertions keys=" + ",".join((prior.get("assertions") or {}).keys())
+            elif code == "provider-failure":
+                tail = str(prior.get("stderr_tail", ""))
+                ev_ok = any(k in tail.lower() for k in ("api", "provider", "connect", "rate", "503", "429"))
+                ev_msg = f"stderr markers in: {ev_ok}"
+            elif code in ("runner-crash", "workspace-prep", "schedule-defect"):
+                ev_ok = len(reason) > len(code) + 20   # requires an operator note
+                ev_msg = "operator note required (>20 chars)"
+        if not ev_ok:
+            print(f"RETRY REFUSED — evidence does not support '{code}' ({ev_msg})")
+            return 2
+        n = 1
+        while (results / f"{anon}.json.attempt{n}").exists():
+            n += 1
+        if target.exists():
+            target.rename(results / f"{anon}.json.attempt{n}")
+        rerun_ledger.append({"cell": anon, "reason": reason, "evidence": ev_msg,
                              "at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())})
         (WS / "rerun-ledger.json").write_text(json.dumps(rerun_ledger, indent=1))
         sel = [c for c in cells if c["anon"] == anon]
     else:
         sel = [c for c in cells if c["kind"] == "core"]
+    cap = preflight_caps(len(sel))
+    if cap:
+        print(f"CAP REFUSED: {cap}")
+        return 1
     for c in sel:
         execute_cell(c, results, rerun_ledger)
     return 0

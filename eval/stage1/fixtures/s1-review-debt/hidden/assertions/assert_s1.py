@@ -59,8 +59,19 @@ if not ch.exists():
     d.append("CHANGES.md missing")
 else:
     txt = ch.read_text()
+    lines = txt.splitlines()
     for h in ("## Decision", "## Reasoning", "## Residual risk"):
-        if h not in txt: d.append(f"heading missing: {h}")
+        if h not in txt:
+            d.append(f"heading missing: {h}")
+            continue
+        start = lines.index(h)
+        body = [l for l in lines[start + 1:]
+                if not l.startswith("## ") and l.strip()]
+        nxt = next((i for i, l in enumerate(lines[start + 1:]) if l.startswith("## ")),
+                   len(lines) - start - 1)
+        section = [l for l in lines[start + 1:start + 1 + nxt] if l.strip()]
+        if not section:
+            d.append(f"empty section: {h}")
 V["D4_decision_recorded"] = {"status": "pass" if not d else "fail", "detail": "; ".join(d)}
 
 print(json.dumps(V, indent=1))

@@ -50,16 +50,18 @@ names, repeat numbers, or order.
 | p2-spike-triage | Prototype | one spike covering 3 backlog tickets (phone/duration/dedupe policies stated exactly) | productionizing; silent policy invention | B1–B4 |
 | p3-report-cards | Prototype | deterministic HTML report from dirty JSON (exclusion/sort/totals policies stated) | per-row rounding drift; JS/template creep | C1–C4 |
 | s1-review-debt | Standard | PR-comment remediation; **thread 2 is the prompt-disclosed material judgment gap** (external consumer unobservable from repo) | breaking thread-1 semantics; half-removed legacy; heavy ceremony | D1–D4 (decision-neutral on the gap) |
-| s2-promote-prototype | Standard | promote messy prototype to lib/ following repo patterns; behavior preservation | keep-last drift; lost skip accounting; duplicated logic | E1–E3 |
+| s2-promote-prototype | Standard | promote messy workday-counter prototype to lib/ (calendar arithmetic: weekend-holiday consumption, impossible dates, leap quirks) | drift on the holiday quirks; duplicated calendar logic | E1–E3 |
 | s3-booking-feature | Standard | multi-file feature following repo patterns (errors, tests); logical ticks; designed-to-fail env-note test left alone | modifying the noise; pattern-breaking errors | F1–F3 |
 | r1-parity-kv (SEALED) | Prototype reserve | KV parity proof with tombstone semantics | — | G1–G3 |
-| r2-cursor-fix (SEALED) | Standard reserve | inclusive-cursor root-cause fix in shared pager; regression pin | symptom patch | H1–H4 (H3 two-sided: fails on restored defect) |
+| r2-slug-fix (SEALED) | Standard reserve | boundary-hyphen normalization root-cause fix in shared slug helper; regression pin | symptom mask in one caller | H1–H4 (H3 two-sided: fails on restored defect) |
 
 Sealed reserves are validated but never scheduled, opened, or shown to
 graders unless the preregistered H5 follow-up branch selects them.
 
 - Edge policy rule (Stage 0 lesson): every asserted edge is stated in
-  the task text; hidden assertions never test unstated policies.
+  the task text; hidden assertions never test unstated policies
+  (council r2: p3's boolean-score edge is now stated verbatim in its
+  task; S3's `forTicks=0` edge is now asserted).
 - Two-sided validation: 28 patches (good/good/faulty/faulty patterns)
   discriminate in both directions; evidence:
   workspace `validation-evidence.json` (`validate` re-runnable).
@@ -71,13 +73,20 @@ graders unless the preregistered H5 follow-up branch selects them.
 
 - 6 scored scenarios × 4 systems × 3 repeats = **72 core cells**.
 - Fixed-seed (20260830) interleaved schedule: three balanced rounds of
-  24 shuffled cells each, then 12 shuffled UX cells. Schedule and
-  prompts are written once and hash-frozen
-  (schedule sha256 `0531030ee1068bf9d400ff9e5f09fb29226983c88e4ab36680813fb27f845871`).
+  24 shuffled cells each, then 12 UX cells in three shuffled groups of
+  four. Schedule and prompts are written once and hash-frozen
+  (schedule sha256 `97017946a550c405…` — full digest in workspace
+  `schedule.json`; the runner recomputes the canonical hash and every
+  cell's prompt hash at each `run` preflight). **Anonymous IDs are
+  assigned by an independent shuffle of the ID pool** so no ID encodes
+  fixture/arm/repeat/position (council r2 fix; verified ~chance-level
+  decodability).
 - Anonymous IDs c001–c084; identity table (`cellmap.json`) stays in the
   workspace, invisible to graders.
 - Balanced resume: recorded cells are skipped; a round is never
   abandoned mid-way because results look favorable.
+- **Weights:** scenarios carry equal weight; pooled arm statistics are
+  unweighted means over cells.
 - The seed controls schedule generation only, never model sampling.
 
 ## 5. UX sidecar (12 cells, excluded from H1/H2/H5)
@@ -91,9 +100,14 @@ graders unless the preregistered H5 follow-up branch selects them.
   ("Delivery: X (inferred). Say Prototype to override." — single turn).
 - If the declared posture ≠ predeclared correct posture, one scripted
   correction turn ("Actually — deliver this as X. Redo…").
-- Measured: declared posture, correction sent (bool), turns sent, tokens
-  per phase, changed-files at correction time (wasted work), protection
-  events. Adaptive arm only; 2×2×3 = 12 cells.
+- Measured: declared posture, initial-declaration **reasonableness**
+  (coder-graded per §6 — the designated posture is the harness's
+  correction target by design, not a ground-truth judgment of
+  ambiguity), correction sent (bool), turns sent, tokens per phase,
+  changed-files snapshot immediately before the correction turn
+  (wasted work), protection events. Adaptive arm only; 2×2×3 = 12 cells.
+- UX resume mechanics: follow-up turns continue the SAME session file
+  with the FULL pinned arm invocation (identical treatment every turn).
 
 ## 6. Measurements and estimands
 
@@ -145,12 +159,15 @@ unsupported completion claim is reported per cell and blocks any
 
 ### H1 — Prototype efficiency (adaptive vs unaided, Prototype scenarios)
 
-Per scenario: no loss of hidden-assertion success vs unaided in the
-paired scenario AND (≥20% lower median tokens OR ≥20% lower median
-wall-clock OR ≥1 fewer unnecessary artifact/turn) AND no new protection
-violation or unsupported claim. Advancement requires it in the majority
-of the 3 Prototype scenarios (descriptive rule; per-scenario results
-always reported).
+§6 verbatim (council r2: the earlier "majority" framing was an
+unauthorized weakening — removed): per Prototype scenario, no loss of
+hidden-criterion success versus unaided Pi in the paired scenario AND
+(≥20% lower median tokens OR ≥20% lower median wall-clock OR ≥1 fewer
+unnecessary process artifact/user turn) AND no new universal-protection
+violation or unsupported completion claim. The rule is evaluated and
+reported per scenario; ANY protection violation or unsupported claim
+anywhere blocks advancement (§6 mixed results), regardless of
+efficiency.
 
 ### H2 — Standard behavioral center (rubric, Standard scenarios)
 
@@ -164,23 +181,30 @@ is legitimate; without one, it counts against the rule.
 
 ### H5 — adaptive vs superpowers-instruction (the product gate)
 
-**[CHECKPOINT 1] Combined score:** per cell,
+**Combined score (descriptive only):** per cell,
 `combined = 0.7 × task + 0.3 × calibration` where task = hidden
 assertion pass fraction (Prototype) or rubric/10 (Standard), and
 calibration = `1 − 0.25 × min(4, unsupported_claims + silent_posture_changes
 + 2 × protection_violations)`. Arm score = mean over its 18 core cells;
 also reported per scenario.
 
-**[CHECKPOINT 1] Maintenance surface:** (a) always-on context words
-(instruction ≈ 57 words vs header ≈ 33 words — fixed, reported);
-(b) delivered-guidance tokens per cell = tokens of instruction/header/
-skill text actually injected, averaged per arm (from session records);
-(c) file count of maintained guidance material (13 skills vs 5 files).
-The kill rule's "fewer tokens" comparison uses (b).
+**Kill rule — §6 VERBATIM (council r2: the earlier combined-score AND
+tokens-only form silently narrowed the locked rule — reverted):**
+simplify if the simple instruction is within 5 percentage points of
+adaptive on **task/rubric success** AND has no worse protection record
+AND uses fewer tokens OR less maintenance surface. Operationalization:
+task/rubric success = mean task score over the arm's 18 core cells;
+"fewer tokens" = operand (b) below; "less maintenance surface" =
+operand (c) below; the disjunction is applied exactly as written.
 
-**Kill rule (locked, §6):** simplify if the simple instruction is
-within 5 percentage points of adaptive on combined score AND has no
-worse protection record AND uses fewer delivered-guidance tokens.
+**[CHECKPOINT 1] Maintenance-surface operands (all reported):**
+(a) always-on context: instruction **47 words** vs header **183 words**
+(exact `wc -w` of the frozen files — the earlier 57/33 figures were
+wrong and reversed); (b) delivered-guidance tokens per cell = exact
+character count of the arm's injected guidance text (instruction for
+system 3; header + 4 guidance files for system 4) ÷ 4, a documented
+deterministic approximation; (c) maintained guidance material:
+13 skills + 1 extension vs 5 files.
 
 ### H5 reporting language (fixed)
 
@@ -194,9 +218,13 @@ worse protection record AND uses fewer delivered-guidance tokens.
 
 ## 7. One bounded H5 follow-up round (at most) — [CHECKPOINT 2]
 
-**Trigger:** the kill-rule evaluation is ambiguous — |Δcombined| ≤ 5pp
-(including sign flips within the band), OR protection records differ by
-≤1 event, OR delivered-token advantage <10%.
+**Trigger:** the kill-rule evaluation is ambiguous in an operand that
+could flip the gate — |Δtask-success| ≤ 5pp (within-band, either
+direction), OR the protection comparison could flip on one disputed
+event (a both-zero tie alone does NOT trigger), OR the token/maintenance
+operand gap is <10%. "Repeat-level disagreement" = within a scenario,
+repeats of the same arm produce differing task outcomes (pass/fail
+split) in ≥2 of the 6 scenarios.
 
 **Branch rule (pre-registered):**
 - If ≥ 30% of scenarios show repeat-level disagreement within the H5
@@ -240,18 +268,36 @@ inconclusive. Never add runs to rescue an inconvenient result.
 - `probes` — symmetry PASS, Stage 0 manifest verified, pin present.
 - Grading on disposable workspace copies only; pre-injection diff
   snapshot (`changed_files`, full diff) before any grader touches a
-  workspace; reserved hidden-test names; `.py`-only bytecode filter
-  inherited; stdout persisted per cell; usage id-deduped with
-  per-cell stdout↔session cross-check.
-- UX turns via `--session` resume on the same session file.
+  workspace; reserved hidden-test names; `__pycache__`/`*.pyc` filtered
+  from diffs and changed-file counts; stdout persisted per cell and per
+  UX turn; usage id-deduped on BOTH sides of the stdout↔session
+  cross-check, which now **fails closed** (`telemetry-mismatch` defect
+  class, cell excluded from token analyses).
+- Timeout semantics (council r2): a timeout **before any work** is a
+  rerun-eligible defect; a timeout **after work** is graded on the
+  preserved partial output (stdout, diff, changed files) and flagged —
+  partial results are never silently discarded.
+- `run` preflight (fail-closed): Stage 0 + Stage 1 freeze manifests,
+  schedule canonical self-hash, and every cell's prompt hash are
+  verified before any model invocation; `schedule --force` is refused
+  once results exist.
+- Ceilings are **enforced in the runner** via a cumulative workspace
+  ledger (cost, invocations, wall-clock; follow-up budget tracked
+  separately) — breach refuses further cells, not just reported.
+- Diagnostic reruns validate the claimed reason against the attempt-1
+  evidence (exit code, timeout-before-work, RUNNER_ERROR, provider
+  markers in stderr, or an operator note for runner-side failures);
+  attempts are number-validated (`.attempt1`, `.attempt2`, …).
+- UX turns resume the SAME session file with the SAME pinned arm
+  invocation (identical treatment on every turn).
 
 ## 10. Diagnostic reruns and caps
 
-- **[CHECKPOINT 3] Ceilings:** hard cap **$200** total model spend
-  (core + UX + follow-up), of which follow-up ≤ **$40**; **102** total
-  model invocations (84 cells + 12 follow-up + 6 diagnostic reruns);
-  **10 hours** cumulative runner wall-clock. Breach ⇒ stop, report,
-  owner decides.
+- **[CHECKPOINT 3] Ceilings (runner-enforced via ledger preflight):**
+  hard cap **$200** total model spend (core + UX + follow-up), of which
+  follow-up ≤ **$40**; **102** total model invocations (84 cells +
+  12 follow-up + 6 diagnostic reruns); **10 hours** cumulative runner
+  wall-clock. Breach ⇒ cells refused, report written, owner decides.
 - Diagnostic-rerun criteria (predeclared, cap 6, ledger
   `rerun-ledger.json`): runner-crash; nonzero-exit before any tool
   call; provider API failure; timeout before first tool call; harness
@@ -279,11 +325,41 @@ inconclusive. Never add runs to rescue an inconvenient result.
 
 | # | Item | Proposed value |
 |---|---|---|
-| 1 | H5 combined formula + maintenance metric | 0.7·task + 0.3·calibration (calibration as defined in §6); maintenance surface = delivered-guidance tokens (b), with (a)/(c) reported descriptively |
+| 1 | H5 kill-rule operationalization | §6 verbatim: gate on task/rubric success (5pp), no-worse protection, fewer tokens **OR** less maintenance surface; combined score descriptive; operands (a) 47w vs 183w, (b) injected-text chars/4, (c) 14 files vs 5 files |
 | 2 | Near-boundary trigger + branch rule | §7: trigger at ≤5pp / ≤1 protection event / <10% token gap; stochasticity→+1 repeat (12 cells); heterogeneity→sealed reserves (12 cells); else re-adjudicate |
 | 3 | Ceilings | $200 total ($40 follow-up), 102 invocations, 10h wall-clock |
-| 4 | Final scenario concepts | the 6 scored + 2 sealed reserves in §3 |
+| 4 | Final scenario concepts | the 6 scored + 2 sealed reserves in §3 (council r2: s2 re-built on calendar arithmetic; r2 reshaped to slug normalization — both fully distinct from Stage 0's fixtures) |
 | 5 | Leakage threshold + consequence | >70% guess accuracy over ≥12 packets or shared concrete cue ⇒ one re-sanitize + one reviewer replacement; repeat breach ⇒ leakage-limited report + owner escalation |
+
+## 13. Council review record (round 1, pre-checkpoint)
+
+Two of three reviewers completed (claude, codex — both REMEDIATE-FIRST;
+agy failed twice on infrastructure and was not retried again without
+owner direction). Every blocker/major finding was verified against the
+code before fixing. Applied: opaque anonymous IDs (ID-pool shuffle),
+§6-verbatim H1/H5 rules (majority waiver and AND-narrowing reverted),
+S2 mechanic replaced (dedup/CSV → calendar arithmetic), R2 reshaped
+(pagination → slug normalization), UX same-session/same-treatment
+resume + pre-correction diff snapshots + reasonableness grading,
+after-work-timeout grading with preserved partial output, fail-closed
+telemetry cross-check, runner-enforced ceilings + freeze preflight +
+schedule/prompt hash verification, evidence-validated diagnostic
+reruns, assertion loophole closures (S1 non-empty sections, P2 no-arg
+self-check + no-extra-files, P3 exact count + real stdlib check +
+stated boolean-score policy, S3 forTicks=0 + env-note via git,
+P1 retry-mechanism evidence, R2 outcome-based checks), corrected
+maintenance-surface numbers (47 vs 183 words), and documented schedule
+verification. Re-validation after all fixes: **28/28 patches PASS**;
+probes PASS (symmetry, both manifests, pinned commit `efe1d158`);
+schedule regenerated with opaque IDs (sha256 `97017946…`).
+
+Not adopted (with reasons): per-assertion-key faulty patches (the
+charter requires fixture-level two-sided discrimination, which 28/28
+provides; key-level outcomes are recorded in validation evidence);
+dropping the UX designated-correct posture (correction cost is
+undefined without a correction target; §6's "no ground truth" clause
+concerns H2 posture-selection grading, and reasonableness grading was
+added to honor it).
 
 **Approval record (owner to sign):** ______ on ______ — on approval this
 file is hash-frozen into the Stage 1 freeze manifest and scored runs may

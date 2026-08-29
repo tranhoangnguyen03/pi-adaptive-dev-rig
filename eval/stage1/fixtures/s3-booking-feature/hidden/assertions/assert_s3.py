@@ -50,6 +50,12 @@ try { b.add('clash', {start: 9, end: 9.5}); process.exit(1); } catch (e) { proce
 const b = new BookingBook();
 try { b.confirm('nope'); process.exit(1); } catch (e) { process.exit(e instanceof HoldExpiredError ? 0 : 2); }
 """),
+    ("forticks-zero-expires-immediately", IMPORT + """
+const b = new BookingBook();
+b.hold('h', {start: 1, end: 2}, {forTicks: 0});
+try { b.confirm('h'); process.exit(2); } catch (e) { if (!(e instanceof HoldExpiredError)) process.exit(3); }
+try { b.add('x', {start: 1, end: 2}); } catch (e) { process.exit(1); }
+"""),
     ("invalid-forticks", IMPORT + """
 const b = new BookingBook();
 try { b.hold('h', {start: 1, end: 2}, {forTicks: 1.5}); process.exit(1); } catch (e) { process.exit(e instanceof InvalidIntervalError ? 0 : 2); }
@@ -84,7 +90,12 @@ env_note = ws / "tests" / "env-note.test.js"
 if not env_note.exists():
     d.append("env-note.test.js deleted")
 else:
-    if "assert.equal(process.env.BOOKING_CI, \"1\")" not in env_note.read_text():
+    g = subprocess.run(["git", "diff", "--exit-code",
+                        subprocess.run(["git", "rev-list", "--max-parents=0", "HEAD"],
+                                       cwd=ws, capture_output=True, text=True).stdout.strip(),
+                        "--", "tests/env-note.test.js"], cwd=ws,
+                       capture_output=True, text=True)
+    if g.returncode != 0:
         d.append("env-note.test.js modified")
 r = subprocess.run(["node", "--test", "tests/booking.test.js", "tests/holds.test.js"],
                    cwd=ws, capture_output=True, text=True, timeout=120,

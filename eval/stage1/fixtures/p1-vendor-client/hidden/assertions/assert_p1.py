@@ -33,6 +33,8 @@ d = []
 src = (ws / "export.py").read_text() if (ws / "export.py").exists() else ""
 if "time.sleep" in src:
     d.append("time.sleep present")
+if not re.search(r"retries\s*=\s*[1-9]", src):
+    d.append("client retry mechanism not used (retries>=1 absent)")
 g = run(["git", "diff", "--exit-code", initial := run(["git", "rev-list", "--max-parents=0", "HEAD"]).stdout.strip(), "--", "vendor/"])
 if g.returncode != 0:
     d.append("vendor/ modified")

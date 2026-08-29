@@ -129,12 +129,15 @@ frozen as-is for Stage 1.
 
 | cell | system | fixture | assertions | wall | tokens | cost |
 |---|---|---|---|---|---|---|
-| P1 | unaided | prototype | A1 pass, A2 pass | 90s | 123,600 | $0.63 |
-| P2 | superpowers-rival | prototype | A1 pass, A2 pass | 80s | 95,630 | $0.50 |
-| P3 | adaptive | prototype | A1 pass, A2 pass | 160s | 181,388 | $0.97 |
-| S1 | unaided | standard | H1 pass, H2 pass, H3 pass | 260s | 148,954 | $0.61 |
-| S2 | superpowers-rival | standard | H1 pass, H2 pass, H3 pass | 96s | 181,950 | $0.61 |
-| S3 | adaptive | standard | H1 pass, H2 pass, H3 pass | 227s | 417,526 | $1.30 |
+| P1 | unaided | prototype | A1 pass, A2 pass | 90s | 61,800 | $0.31 |
+| P2 | superpowers-rival | prototype | A1 pass, A2 pass | 80s | 47,815 | $0.25 |
+| P3 | adaptive | prototype | A1 pass, A2 pass | 160s | 90,694 | $0.48 |
+| S1 | unaided | standard | H1 pass, H2 pass, H3 pass | 260s | 74,477 | $0.30 |
+| S2 | superpowers-rival | standard | H1 pass, H2 pass, H3 pass | 96s | 90,975 | $0.30 |
+| S3 | adaptive | standard | H1 pass, H2 pass, H3 pass | 227s | 208,763 | $0.65 |
+
+(Telemetry corrected in remediation round 2 — session-canonical, stdout↔session
+agreement 6/6; diagnostic-rerun attempt P1a: 84,439 tokens, $0.39.)
 
 No cell exhibited a D11 defect (all exit 0, no timeouts, no harness
 failures). Harness/fixture defects were found and fixed *within* the gate
@@ -158,9 +161,10 @@ fixing:
    `test_export.py`/`test_windows_edges.py` overwrote and then deleted the
    agents' own identically-named files in all three S workspaces. Fixed:
    reserved hidden names (`test_h1_hidden_export.py`, `test_h2_hidden_edges.py`)
-   and fully non-mutating grading in throwaway workspace copies. Damaged
-   agent files restored byte-exact from session transcripts (S1/S2/S3
-   `tests/test_export.py`).
+   — collision-*resistant*, not absolutely collision-proof — and fully
+   non-mutating grading in throwaway workspace copies (both fixtures as of
+   round 3). Damaged agent files restored byte-exact from session
+   transcripts (S1/S2/S3 `tests/test_export.py`).
 8. **H3 could be satisfied by any nonzero exit (codex)** — a test failing
    even on the completed work certified "protection". Fixed: a changed test
    qualifies only if it PASSES on the work AND FAILS on pristine-lib revert.
@@ -175,6 +179,27 @@ fixing:
 Also verified during remediation: rival prompts for P2/S2 contained the
 right-sizing instruction (prompt-fidelity check); pinned superpowers clone
 remains at `efe1d15`.
+
+### Remediation round 3 (council pass 2, 2026-08-30 — final)
+
+Codex's pass-2 nits, all zero-spend: README outcome table updated to the
+corrected telemetry; prototype grading made non-mutating (throwaway copy,
+matching the standard fixture); trace manifest regenerated after the final
+ambiguities.md amendment with corrected scope note (work/ excluded as a
+legitimately-amended artifact, not an immutable trace); manifest entry
+counts reconciled (freeze manifest: 38 hashed entries + header; trace
+manifest regenerated below). Freeze manifest regenerated (assert_proto.py
+changed).
+
+### Council decision (owner-delegated, pass 2)
+
+Verdicts: agy APPROVE-FREEZE (flipped from REMEDIATE-FIRST), claude
+APPROVE-FREEZE (held), codex APPROVE conditional on this round's mechanical
+fixes. **Collective decision: freeze APPROVED; D14 margins adopted
+verbatim** (EVALUATION.md §6 values including H1's protection clause and
+H5's no-worse-protection clause; no margin derived from Stage 0 data);
+recorded in docs/EVALUATION.md §6. Run-cap interpretation ratified
+(7 fixture runs + 5 mechanism probes, all enumerated above).
 
 ### Stage 1 entry conditions
 

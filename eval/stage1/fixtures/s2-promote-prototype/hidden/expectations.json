@@ -1,0 +1,17 @@
+{
+ "good-a": {
+  "E1_behavior_exact": "pass",
+  "E2_patterns_and_tests": "pass",
+  "E3_no_duplicated_logic": "pass"
+ },
+ "faulty-1": {
+  "E1_behavior_exact": "fail",
+  "E2_patterns_and_tests": "fail",
+  "E3_no_duplicated_logic": "pass"
+ },
+ "faulty-2": {
+  "E1_behavior_exact": "fail",
+  "E2_patterns_and_tests": "fail",
+  "E3_no_duplicated_logic": "pass"
+ }
+}

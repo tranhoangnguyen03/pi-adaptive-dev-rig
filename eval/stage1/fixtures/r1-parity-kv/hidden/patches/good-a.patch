@@ -1,0 +1,46 @@
+diff --git a/VERDICT.md b/VERDICT.md
+new file mode 100644
+index 0000000..0382722
+--- /dev/null
++++ b/VERDICT.md
+@@ -0,0 +1,5 @@
++Identical on key-set semantics: every op sequence tried (re-sets,
++delete-then-set, delete-missing) leaves both stores with the same
++surviving keys. No divergent sequence found within the tested space.
++Limitation: only final key sets compared, not values or get() timing;
++no performance or persistence claims.
+diff --git a/parity.js b/parity.js
+new file mode 100644
+index 0000000..1a2d7e9
+--- /dev/null
++++ b/parity.js
+@@ -0,0 +1,29 @@
++#!/usr/bin/env node
++// Parity proof: FlatKV vs LogKV on an op sequence.
++const assert = require("node:assert");
++const fs = require("node:fs");
++
++function run(Ops, store) {
++  const KV = store; // duck-typed: set/get/delete/keys
++  for (const op of Ops) {
++    if (op[0] === "set") KV.set(op[1], op[2]);
++    else KV.delete(op[1]);
++  }
++  return KV.keys();
++}
++
++async function main() {
++  const { FlatKV, LogKV } = await import("./mini_kv.js");
++  const flat = new FlatKV(), log = new LogKV();
++  const i = process.argv.indexOf("--ops");
++  if (i !== -1) {
++    const ops = JSON.parse(fs.readFileSync(process.argv[i + 1], "utf8"));
++    const f = run(ops, flat), l = run(ops, log);
++    console.log(JSON.stringify({ flat: f, log: l, agree: JSON.stringify(f) === JSON.stringify(l) }));
++  } else {
++    assert.deepEqual(run([["set","a",1],["del","a"]], new FlatKV()), []);
++    assert.deepEqual(run([["set","a",1],["set","a",2],["del","b"]], new LogKV()), ["a"]);
++    assert.equal(run([["set","x",1]], new FlatKV()).length, 1);
++  }
++}
++main();

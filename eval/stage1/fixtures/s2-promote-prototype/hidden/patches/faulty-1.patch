@@ -1,0 +1,129 @@
+diff --git a/lib/totals.py b/lib/totals.py
+new file mode 100644
+index 0000000..f6df86e
+--- /dev/null
++++ b/lib/totals.py
+@@ -0,0 +1,45 @@
++"""Route stats: promoted from scripts/prototype_totals.py.
++
++Behavior contract lives in the task/README: malformed rows are skipped
++and counted; duplicate (route, status, ms) triples keep the first
++occurrence; output is sorted by route with %g totals.
++"""
++from typing import Tuple
++
++
++def summarize(text: str) -> Tuple[str, int]:
++    """Summarize CSV access-log text into (csv_out, skipped_count)."""
++    seen = set()
++    _first_ms = {}
++    stats = {}
++    skipped = 0
++    for raw in text.splitlines():
++        fields = next(_csv_rows([raw]))
++        if len(fields) != 3:
++            skipped += 1
++            continue
++        route, status, ms_text = fields
++        try:
++            ms = float(ms_text)
++        except ValueError:
++            skipped += 1
++            continue
++        key = (route, status, ms)
++        if key in seen:
++            stats[route] = (stats[route][0], stats[route][1] - _first_ms[key])  # WRONG: un-does first
++            skipped += 1
++            continue
++        seen.add(key)
++        _first_ms[key] = ms
++        count, total = stats.get(route, (0, 0.0))
++        stats[route] = (count + 1, total + ms)
++    lines = ["route,count,total_ms"]
++    for route in sorted(stats):
++        count, total = stats[route]
++        lines.append(f"{route},{count},{total:g}")
++    return "\n".join(lines) + "\n", skipped
++
++
++def _csv_rows(lines):
++    import csv
++    yield from csv.reader(lines)
+diff --git a/scripts/prototype_totals.py b/scripts/prototype_totals.py
+index e769b68..99bef5a 100644
+--- a/scripts/prototype_totals.py
++++ b/scripts/prototype_totals.py
+@@ -1,23 +1,15 @@
+-# quick prototype: route stats from access-log CSV. works. messy on purpose.
+-import csv, sys
++# Thin wrapper — logic lives in lib/totals.py now.
++import sys
+ 
+-def main(text):
+-    seen = set(); out = {}; skipped = 0
+-    for row in csv.reader(text.splitlines()):
+-        if len(row) != 3: skipped += 1; continue
+-        route, status, ms = row
+-        try: ms = float(ms)
+-        except ValueError: skipped += 1; continue
+-        key = (route, status, ms)
+-        if key in seen: skipped += 1; continue   # dup line: keep first
+-        seen.add(key)
+-        c, t = out.get(route, (0, 0.0)); out[route] = (c + 1, t + ms)
+-    lines = ["route,count,total_ms"]
+-    for r in sorted(out):
+-        c, t = out[r]; lines.append(f"{r},{c},{t:g}")
+-    return "\n".join(lines) + "\n", skipped
++from lib.totals import summarize
+ 
+-if __name__ == "__main__":
+-    out, skipped = main(open(sys.argv[1]).read() if len(sys.argv) > 1 else sys.stdin.read())
++
++def main():
++    text = open(sys.argv[1]).read() if len(sys.argv) > 1 else sys.stdin.read()
++    out, skipped = summarize(text)
+     sys.stderr.write(f"skipped {skipped}\n")
+     sys.stdout.write(out)
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/tests/test_totals.py b/tests/test_totals.py
+new file mode 100644
+index 0000000..6434ae4
+--- /dev/null
++++ b/tests/test_totals.py
+@@ -0,0 +1,33 @@
++"""Tests for lib.totals — behavior contract from the prototype."""
++import unittest
++
++from lib.totals import summarize
++
++
++class SummarizeTest(unittest.TestCase):
++    def test_duplicate_triple_keeps_first(self):
++        out, skipped = summarize("/a,200,5\n/a,200,5\n")
++        self.assertEqual(out, "route,count,total_ms\n/a,1,5\n")
++        self.assertEqual(skipped, 1)
++
++    def test_float_equal_but_text_differs_is_not_dup(self):
++        out, skipped = summarize("/a,200,5\n/a,200,5.0\n")
++        self.assertEqual(out, "route,count,total_ms\n/a,2,10\n")
++        self.assertEqual(skipped, 0)
++
++    def test_malformed_rows_counted(self):
++        _, skipped = summarize("/c,200,oops\n/d,200\n")
++        self.assertEqual(skipped, 2)
++
++    def test_empty_input_is_header_only(self):
++        out, skipped = summarize("")
++        self.assertEqual(out, "route,count,total_ms\n")
++        self.assertEqual(skipped, 0)
++
++    def test_sorted_by_route(self):
++        out, _ = summarize("/b,200,1\n/a,200,2\n")
++        self.assertEqual(out, "route,count,total_ms\n/a,1,2\n/b,1,1\n")
++
++
++if __name__ == "__main__":
++    unittest.main()

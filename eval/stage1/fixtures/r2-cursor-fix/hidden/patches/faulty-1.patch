@@ -1,0 +1,36 @@
+diff --git a/src/export.js b/src/export.js
+index a4cc084..31a1df3 100644
+--- a/src/export.js
++++ b/src/export.js
+@@ -1,7 +1,7 @@
+-// Caller 1: export all rows (uses the shared pager).
++// Caller 1: export all rows — deduped locally (symptom patch, #88 NOT fixed).
+ import { CursorPager } from "./pager.js";
+ import { fetchPage } from "./server.js";
+ 
+ export function exportAll() {
+-  return CursorPager.pageAll(fetchPage).map((x) => x.id);
++  return [...new Set(CursorPager.pageAll(fetchPage).map((x) => x.id))];
+ }
+diff --git a/tests/regress.test.js b/tests/regress.test.js
+new file mode 100644
+index 0000000..2ee7f59
+--- /dev/null
++++ b/tests/regress.test.js
+@@ -0,0 +1,16 @@
++import test from "node:test";
++import assert from "node:assert/strict";
++import { exportAll } from "../src/export.js";
++import { audit } from "../src/audit.js";
++
++test("regression #88: no duplicate rows across page boundaries", () => {
++  const ids = exportAll();
++  assert.equal(new Set(ids).size, ids.length, "duplicate ids across pages");
++  assert.equal(ids.length, 12);
++  assert.equal(ids[0], "id-001");
++  assert.equal(ids[ids.length - 1], "id-012");
++});
++
++test("regression #88: audit stays correct through the shared pager", () => {
++  assert.deepEqual(audit(), { count: 12, sum: 78, unique: 12 });
++});

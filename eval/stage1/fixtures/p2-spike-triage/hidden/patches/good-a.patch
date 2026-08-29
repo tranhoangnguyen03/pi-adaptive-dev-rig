@@ -1,0 +1,62 @@
+diff --git a/LIMITATIONS.md b/LIMITATIONS.md
+new file mode 100644
+index 0000000..e963fc5
+--- /dev/null
++++ b/LIMITATIONS.md
+@@ -0,0 +1,3 @@
++- US-only phone policy; no international prefixes.
++- Duration parser rejects floats ("1.5h") and repeated units are summed, not canonicalized.
++- Dedupe is by exact string key; no normalization before comparison.
+diff --git a/spike.js b/spike.js
+new file mode 100644
+index 0000000..b6f1261
+--- /dev/null
++++ b/spike.js
+@@ -0,0 +1,47 @@
++#!/usr/bin/env node
++// Spike for ISSUES.md #4 #5 #6 — one file, no dependencies.
++const assert = require("node:assert");
++
++function normalizePhone(s) {
++  const d = String(s).replace(/\D+/g, "");
++  if (/^\d{10}$/.test(d)) return "+1" + d;
++  if (/^1\d{10}$/.test(d)) return "+1" + d.slice(1);
++  return null;
++}
++
++function parseDuration(s) {
++  if (typeof s !== "string" || s === "") return null;
++  let total = 0, matched = 0;
++  for (const m of s.matchAll(/(\d+)([smh])/g)) {
++    total += Number(m[1]) * (m[2] === "s" ? 1 : m[2] === "m" ? 60 : 3600);
++    matched += m[0].length;
++  }
++  return matched === s.length ? total : null;
++}
++
++function dedupeKeepFirst(pairs) {
++  const seen = new Set(), out = [];
++  for (const [k, v] of pairs) {
++    if (!seen.has(k)) { seen.add(k); out.push([k, v]); }
++  }
++  return out;
++}
++
++function selfCheck() {
++  assert.equal(normalizePhone("(555) 010-9999"), "+15550109999");
++  assert.equal(parseDuration("1m30s"), 90);
++  assert.deepEqual(dedupeKeepFirst([["a", 1], ["a", 2]]), [["a", 1]]);
++}
++
++const fs = require("node:fs");
++const i = process.argv.indexOf("--run-cases");
++if (i !== -1) {
++  const c = JSON.parse(fs.readFileSync(process.argv[i + 1], "utf8"));
++  console.log(JSON.stringify({
++    phone: c.phone.map(normalizePhone),
++    duration: c.duration.map(parseDuration),
++    dedupe: dedupeKeepFirst(c.dedupe),
++  }));
++} else {
++  selfCheck();
++}

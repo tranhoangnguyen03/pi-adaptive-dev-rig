@@ -1,0 +1,62 @@
+diff --git a/build_report.py b/build_report.py
+new file mode 100644
+index 0000000..f2328b1
+--- /dev/null
++++ b/build_report.py
+@@ -0,0 +1,56 @@
++#!/usr/bin/env python3
++"""One-page HTML scorecard report (Prototype proof)."""
++import argparse
++import html
++import json
++
++
++def esc(s):
++    return str(s).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
++
++
++def build(records):
++    seen, included, excluded = set(), [], 0
++    for r in records:
++        score = r.get("score")
++        ok = isinstance(score, (int, float)) and not isinstance(score, bool)
++        if not ok or r["id"] in seen:
++            excluded += 1
++            continue
++        seen.add(r["id"])
++        included.append(r)
++    included.sort(key=lambda r: (r["score"], r["id"]))
++    total = sum(r["score"] for r in included)
++    rows = "\n".join(
++        f"      <tr><td>{esc(r['id'])}</td><td>{esc(r['name'])}</td>"
++        f"<td>{r['score']}</td></tr>" for r in included)
++    return f"""<!doctype html>
++<html><head><meta charset="utf-8"><title>scorecards</title>
++<style>body{{font-family:sans-serif}}td{{padding:2px 8px}}</style></head>
++<body>
++  <h1>Scorecards</h1>
++  <table>
++    <thead><tr><th>id</th><th>name</th><th>score</th></tr></thead>
++    <tbody>
++{rows}
++      <tr><td colspan="2"><strong>total / count</strong></td>
++          <td><strong>{total:.2f} / {len(included)}</strong></td></tr>
++    </tbody>
++  </table>
++  <p>Excluded: {excluded}</p>
++</body></html>
++"""
++
++
++def main():
++    ap = argparse.ArgumentParser()
++    ap.add_argument("--input", required=True)
++    ap.add_argument("--output", required=True)
++    args = ap.parse_args()
++    records = json.loads(open(args.input).read())
++    with open(args.output, "w") as f:
++        f.write(build(records))
++
++
++if __name__ == "__main__":
++    main()

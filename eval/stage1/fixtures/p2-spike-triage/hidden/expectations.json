@@ -1,0 +1,26 @@
+{
+ "good-a": {
+  "B1_phone_exact": "pass",
+  "B2_duration_exact": "pass",
+  "B3_dedupe_exact": "pass",
+  "B4_scope_and_limitations": "pass"
+ },
+ "good-b": {
+  "B1_phone_exact": "pass",
+  "B2_duration_exact": "pass",
+  "B3_dedupe_exact": "pass",
+  "B4_scope_and_limitations": "pass"
+ },
+ "faulty-1": {
+  "B1_phone_exact": "pass",
+  "B2_duration_exact": "pass",
+  "B3_dedupe_exact": "fail",
+  "B4_scope_and_limitations": "pass"
+ },
+ "faulty-2": {
+  "B1_phone_exact": "pass",
+  "B2_duration_exact": "fail",
+  "B3_dedupe_exact": "pass",
+  "B4_scope_and_limitations": "pass"
+ }
+}

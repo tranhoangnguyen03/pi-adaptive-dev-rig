@@ -1,0 +1,26 @@
+{
+ "good-a": {
+  "A1_manifest_exact": "pass",
+  "A2_handling_and_scope": "pass",
+  "A3_self_check_fatal": "pass",
+  "A4_minimal_surface": "pass"
+ },
+ "good-b": {
+  "A1_manifest_exact": "pass",
+  "A2_handling_and_scope": "pass",
+  "A3_self_check_fatal": "pass",
+  "A4_minimal_surface": "pass"
+ },
+ "faulty-1": {
+  "A1_manifest_exact": "fail",
+  "A2_handling_and_scope": "pass",
+  "A3_self_check_fatal": "pass",
+  "A4_minimal_surface": "pass"
+ },
+ "faulty-2": {
+  "A1_manifest_exact": "fail",
+  "A2_handling_and_scope": "fail",
+  "A3_self_check_fatal": "pass",
+  "A4_minimal_surface": "pass"
+ }
+}

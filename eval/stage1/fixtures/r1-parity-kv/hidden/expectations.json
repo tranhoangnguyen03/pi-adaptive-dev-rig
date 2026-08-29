@@ -1,0 +1,22 @@
+{
+ "good-a": {
+  "G1_runner_exact": "pass",
+  "G2_self_check": "pass",
+  "G3_verdict": "pass"
+ },
+ "good-b": {
+  "G1_runner_exact": "pass",
+  "G2_self_check": "pass",
+  "G3_verdict": "pass"
+ },
+ "faulty-1": {
+  "G1_runner_exact": "fail",
+  "G2_self_check": "fail",
+  "G3_verdict": "pass"
+ },
+ "faulty-2": {
+  "G1_runner_exact": "pass",
+  "G2_self_check": "fail",
+  "G3_verdict": "pass"
+ }
+}

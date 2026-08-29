@@ -1,0 +1,103 @@
+diff --git a/CHANGES.md b/CHANGES.md
+new file mode 100644
+index 0000000..186b0cb
+--- /dev/null
++++ b/CHANGES.md
+@@ -0,0 +1,15 @@
++# PR #12 remediation
++
++## Decision
++Thread 1: TIMEOUT_MS honored (ConfigError on invalid). Thread 2:
++**remove** legacyMode and src/legacy.js.
++
++## Reasoning
++The shim is a one-line indirection with no internal callers; TelemetryData
++can pin conflow 1.4.x while we ship 2.0 without the flag. Keeping dead
++compatibility paths indefinitely is the larger risk to this repo.
++
++## Residual risk
++If TelemetryData upgrades without pinning, their LEGACY=1 mode silently
++falls back to the modern path. Mitigation: release as a semver-major and
++note the migration in the release notes; confirm with their on-call.
+diff --git a/src/config.js b/src/config.js
+index cd5786f..b924c0f 100644
+--- a/src/config.js
++++ b/src/config.js
+@@ -2,9 +2,15 @@
+ export class ConfigError extends Error {}
+ 
+ export function loadConfig(env = process.env) {
+-  // Timeout is hardcoded — see PR #12 thread (review comment from @dana).
+-  return {
+-    timeout: 5000,
+-    legacyMode: env.LEGACY === "1",
+-  };
++  const cfg = {};
++  if (env.TIMEOUT_MS !== undefined) {
++    const raw = String(env.TIMEOUT_MS).trim();
++    if (!/^\d+$/.test(raw) || Number(raw) <= 0) {
++      throw new ConfigError(`TIMEOUT_MS must be an integer > 0 (got: ${raw})`);
++    }
++    cfg.timeout = Number(raw);
++  } else {
++    cfg.timeout = 5000;
++  }
++  return cfg;
+ }
+diff --git a/src/index.js b/src/index.js
+index 0417585..5795e4d 100644
+--- a/src/index.js
++++ b/src/index.js
+@@ -1,11 +1,7 @@
+ import { loadConfig } from "./config.js";
+-import { legacyPath } from "./legacy.js";
+ 
+-// createClient: main entry. README documents that external consumers
+-// (TelemetryData, issue #57) still run with LEGACY=1.
+ export function createClient(opts = {}) {
+   const cfg = loadConfig(opts.env);
+   const send = (payload) => ({ ok: true, payload, timeout: cfg.timeout });
+-  if (cfg.legacyMode) send.legacy = legacyPath;
+   return { config: cfg, send };
+ }
+diff --git a/src/legacy.js b/src/legacy.js
+deleted file mode 100644
+index 9e916a8..0000000
+--- a/src/legacy.js
++++ /dev/null
+@@ -1,5 +0,0 @@
+-// Legacy compatibility shim. README: "TelemetryData (#57) imports
+-// conflow with LEGACY=1 — coordinate before removal."
+-export function legacyPath(payload) {
+-  return { ok: true, legacy: true, payload };
+-}
+diff --git a/tests/config.test.js b/tests/config.test.js
+index 26a2fda..500ca3f 100644
+--- a/tests/config.test.js
++++ b/tests/config.test.js
+@@ -1,13 +1,18 @@
+ import test from "node:test";
+ import assert from "node:assert/strict";
+-import { loadConfig } from "../src/config.js";
++import { loadConfig, ConfigError } from "../src/config.js";
+ 
+-test("defaults: timeout 5000, legacy off", () => {
+-  const c = loadConfig({});
+-  assert.equal(c.timeout, 5000);
+-  assert.equal(c.legacyMode, false);
++test("defaults: timeout 5000", () => {
++  assert.equal(loadConfig({}).timeout, 5000);
+ });
+ 
+-test("LEGACY=1 enables legacy mode", () => {
+-  assert.equal(loadConfig({ LEGACY: "1" }).legacyMode, true);
++test("TIMEOUT_MS=1500 wins over default", () => {
++  assert.equal(loadConfig({ TIMEOUT_MS: "1500" }).timeout, 1500);
++});
++
++test("TIMEOUT_MS invalid fails fast naming the variable", () => {
++  for (const bad of ["abc", "0", "-5", "2.5"]) {
++    assert.throws(() => loadConfig({ TIMEOUT_MS: bad }), (e) =>
++      e instanceof ConfigError && /TIMEOUT_MS/.test(e.message));
++  }
+ });

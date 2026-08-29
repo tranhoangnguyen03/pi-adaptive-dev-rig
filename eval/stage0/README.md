@@ -208,3 +208,57 @@ recorded in docs/EVALUATION.md §6. Run-cap interpretation ratified
 - Owner review pending (§12 step 5): approve D14 margins into
   `docs/EVALUATION.md` §6; see workspace `ambiguities.md`.
 - Sacrificial fixtures remain excluded from Stage 1's scored set.
+
+## Stage 1 handoff
+
+For the agent implementing the Stage 1 pilot (`docs/EVALUATION.md` §3 Stage 1
+/ §12). Entry conditions are met; this is the operating brief.
+
+### Reuse as-is (frozen — mid-Stage-1 modification invalidates the comparison)
+
+- `header/posture-header.md` — 0 of 2 revision cycles used; frozen.
+- `systems/*.sh` — the three system invocations: symmetric stripped base;
+  rival = pinned package as shipped (13 skills + extension) with the
+  right-sizing instruction prompt-appended; adaptive = 4 guidance skills +
+  header via `--append-system-prompt`.
+- `runner/run.py` — `validate` gate (run before any model spend), `run`,
+  `report`; JSONL telemetry extraction with message-id dedup.
+- Graders — non-mutating (throwaway workspace copies), reserved hidden
+  names, two-sided H3.
+
+### Fixture-authoring rules (paid for in Stage 0 — findings #1–#3, #6–#8)
+
+1. Assert only what the task text explicitly states; underdetermined edges
+   are left unasserted.
+2. Every edge-case policy (e.g. equal start/end semantics) must appear in
+   the task/issue text itself, or it is not assertable.
+3. Hidden artifacts use reserved names (`test_h1_*`, `test_h2_*`) so they
+   cannot collide with agent-authored files.
+4. Regression assertions are two-sided: pass on the completed work AND fail
+   on the reverted defect.
+5. Snapshot the workspace diff BEFORE injecting anything; grade only on
+   disposable copies.
+6. Cross-check telemetry per cell: stdout-derived totals must equal
+   session-file totals.
+
+### Stage 1 deltas (do not inherit Stage 0 defaults blindly)
+
+- New scenarios from `docs/EVALUATION.md` §5; the two sacrificial fixtures
+  are banned from the scored set.
+- Four systems (adds current Pi-superpowers without the instruction).
+- ≥3 repeats per system/scenario if cost permits; otherwise report the
+  pilot as exploratory.
+- Randomize run order (Stage 0's fixed order was non-evidentiary
+  convenience only).
+- Blinded grading against hidden assertions + the H2 rubric.
+- Margins recorded in §6 are locked — never tuned after outcomes.
+
+### Where the evidence lives
+
+- Workspace: `../pi-adaptive-dev-rig-evalruns/stage0/` (results with
+  in-file amendment trails, sessions, stdout, prompts, work/,
+  `manifest-traces.txt`, `ambiguities.md`).
+- Verify: `shasum -a 256 -c eval/stage0/freeze-manifest.txt` (repo root)
+  and the trace manifest (workspace root).
+- Cost calibration: ≈$2.7 for 7 small runs (largest cell 209k tokens /
+  $0.65) — use for Stage 1 budgeting.

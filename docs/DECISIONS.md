@@ -94,6 +94,8 @@ The owner waived the original Stage 0 question — whether the postures produce 
 - Hard cap: 6–8 runs and at most two header revision cycles, then freeze; mid-Stage-1 iteration invalidates the comparison.
 - The Hardened fixture is deferred to Stage 3.
 
+**Status: completed 2026-08-30.** 7 runs of the 8 cap (6 cells + 1 predeclared diagnostic rerun); 0 of 2 header revision cycles used. Freeze, remediation trail, and the owner-delegated council approval are recorded in `eval/stage0/README.md`. Stage 1 margins were adopted verbatim as owner-approved and recorded in `docs/EVALUATION.md` §6; nothing from Stage 0 counts as hypothesis evidence.
+
 ## Recommended
 
 ### R-001 — Use “delivery posture” as the primary term

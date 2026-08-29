@@ -1,0 +1,45 @@
+diff --git a/commands/list.py b/commands/list.py
+index 8ace1cd..0198be1 100644
+--- a/commands/list.py
++++ b/commands/list.py
+@@ -1,7 +1,26 @@
+ """List scheduled windows for the day."""
++from datetime import datetime, timedelta
++
+ from lib.windows import parse_window
+ 
+ 
++def _repair(start, end):
++    """Local workaround for the reported listing issue: treat end<=start as
++    crossing midnight and accept 24:00 as end-of-day, without touching the
++    shared parser (export has its own handling)."""
++    def t(v):
++        if v == "24:00":
++            return datetime.strptime("00:00", "%H:%M") + timedelta(days=1)
++        return datetime.strptime(v, "%H:%M")
++    try:
++        s, e = t(start), t(end)
++    except ValueError:
++        return None
++    if e < s:
++        e += timedelta(days=1)
++    return s, e
++
++
+ def list_windows(rows):
+     """Render one line per (label, start, end) row."""
+     out = []
+@@ -9,8 +28,11 @@ def list_windows(rows):
+         try:
+             start_dt, end_dt = parse_window(start, end)
+         except ValueError:
+-            out.append(f"{label}: invalid window")
+-            continue
++            repaired = _repair(start, end)
++            if repaired is None:
++                out.append(f"{label}: invalid window")
++                continue
++            start_dt, end_dt = repaired
+         minutes = int((end_dt - start_dt).total_seconds() // 60)
+         out.append(
+             f"{label}: {start_dt.strftime('%H:%M')}-{end_dt.strftime('%H:%M')} ({minutes} min)"

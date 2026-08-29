@@ -1,0 +1,13 @@
+customer_id,customer_name,timestamp,amount
+c-201,Françoise Mbeki,2026-01-31T23:59,50.00
+c-201,Françoise Mbeki,2026-02-01 00:01,20.00
+c-202,Oslo Østli,2026-1-2 10:00,9.99
+c-202,Oslo Østli,2026-1-2 10:00,15.99
+c-203,Chen Wei,2026-2-14,33.33
+c-203,Chen Wei,2026-2-14T00:00,33.33
+c-204,Ana Ngo,2026-02-05 12:00,-8.00
+c-205,Björn Guðmundsson,2026-3-9,1.10
+c-205,Björn Guðmundsson,2026-3-9,2.20
+c-206,Márta Sørensen,2026-02-28 23:59,4.44
+c-206,Márta Sørensen,2026-03-01 00:01,5.55
+c-207,O'Brien,2026-02-01,0.01

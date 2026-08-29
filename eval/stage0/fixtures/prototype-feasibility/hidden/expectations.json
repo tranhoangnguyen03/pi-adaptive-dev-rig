@@ -1,0 +1,6 @@
+{
+  "known-good.patch":        {"A1": "pass", "A2": "pass"},
+  "known-good-alt.patch":    {"A1": "pass", "A2": "pass"},
+  "known-faulty-scaffold.patch": {"A2": "fail"},
+  "known-faulty-shallow.patch":  {"A1": "fail"}
+}

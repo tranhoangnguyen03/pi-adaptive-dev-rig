@@ -57,6 +57,10 @@ The project is not intended to become:
 - a label that substitutes for evidence;
 - a broad policy engine attempting to mechanize engineering judgment.
 
+## License
+
+Apache-2.0 — see [LICENSE](LICENSE).
+
 ## Immediate next step
 
 Run the Stage 0 readiness gate in `docs/EVALUATION.md` — non-evidentiary preparation for Stage 1 — then run the Stage 1 pilot to decide whether the guidance architecture deserves a larger validation program. Do not build the delivery kernel or port the full Pi-superpowers skill suite upfront.

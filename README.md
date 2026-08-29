@@ -59,4 +59,4 @@ The project is not intended to become:
 
 ## Immediate next step
 
-Run Stage 0 in `docs/EVALUATION.md`, then use its evidence to decide whether the guidance architecture deserves a larger pilot. Do not build the delivery kernel or port the full Pi-superpowers skill suite upfront.
+Run the Stage 0 readiness gate in `docs/EVALUATION.md` — non-evidentiary preparation for Stage 1 — then run the Stage 1 pilot to decide whether the guidance architecture deserves a larger validation program. Do not build the delivery kernel or port the full Pi-superpowers skill suite upfront.

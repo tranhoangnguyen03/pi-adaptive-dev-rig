@@ -83,6 +83,17 @@ The rig does not replace Pi's or the provider's actual instruction hierarchy. Wi
 
 Delegated agents receive an explicit handoff containing posture, goal, criteria, relevant repository constraints, and authorization limits. Children may report that a posture is inadequate but may not silently change it.
 
+### D-014 — Stage 0 is a non-evidentiary readiness gate, not a smoke comparison
+
+The owner waived the original Stage 0 question — whether the postures produce visibly different behavior — as not in doubt. Stage 0 survives only as capped preparation for Stage 1:
+
+- Build the posture header, minimal capability guidance, and fixture/assertion/telemetry machinery.
+- Two sacrificial fixtures (one Prototype, one Standard) across three systems — unaided Pi; current Pi-superpowers plus the right-sizing instruction; adaptive guidance-only — six runs in one pinned environment.
+- Runs are defect detection only, mechanically validated against known-good and known-faulty artifacts; they never count as hypothesis evidence and cannot affect advancement rules, margins, or H5.
+- Calibration fixtures are excluded from Stage 1's scored set; Stage 1 margins are owner-approved before the pilot, never derived from Stage 0 data.
+- Hard cap: 6–8 runs and at most two header revision cycles, then freeze; mid-Stage-1 iteration invalidates the comparison.
+- The Hardened fixture is deferred to Stage 3.
+
 ## Recommended
 
 ### R-001 — Use “delivery posture” as the primary term

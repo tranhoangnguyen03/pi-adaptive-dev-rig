@@ -30,17 +30,20 @@ A posture header plus progressively disclosed capabilities produces better calib
 
 ## 3. Evaluation stages
 
-### Stage 0 — Smoke evaluation
+### Stage 0 — Readiness gate (non-evidentiary preparation)
 
-Purpose: establish whether the three postures produce useful, visibly different behavior before building a package.
+The owner waived the original smoke-check question — whether the three postures produce visibly different behavior — as not in doubt; the first measured posture-distinctness test is Stage 1's H2/H5 rubric. Stage 0 survives only as capped preparation for Stage 1.
 
-- Three scenarios: one Prototype, one Standard, one Hardened.
-- Two systems: unaided Pi and adaptive guidance-only.
-- One pinned Pi version, model, thinking level, tool set, repository revision, and environment.
-- One primary run per cell, followed by a second run only when the first result is ambiguous.
-- Prefer deterministic hidden assertions; one blinded human reviews scope/evidence calibration.
+Purpose: build the Stage 1 prerequisites and remove mechanical defects before any recorded comparison run. Stage 0 produces infrastructure validation only; its results are never evidence for or against any hypothesis and cannot affect advancement rules, margins, or H5.
 
-Stage 0 is directional, not statistically conclusive. If the postures do not produce clearly useful differences, revise the posture header before proceeding.
+- Build: the portable posture header, minimal explore/design, debug, test/verify, and review guidance, and the fixture/assertion/telemetry machinery.
+- Two sacrificial fixtures: one Prototype, one Standard. No Hardened fixture — Stage 1 does not score one; build it at Stage 3 when the domain risk pack is chosen. Fixtures used for calibration are excluded from Stage 1's scored set.
+- Six runs: two fixtures × three systems — unaided Pi; current Pi-superpowers plus the right-sizing instruction (H5's rival); adaptive guidance-only — in one pinned Pi version, model, thinking level, tool set, repository revision, and environment.
+- Semantics: defect detection only — broken or trivially easy fixtures, assertion-mechanism misfires (including against each system's response shapes), telemetry gaps, and header defects. Validate hidden assertions mechanically against known-good and known-faulty artifacts. A single run never certifies fixture discriminability.
+- One predeclared diagnostic rerun per cell is allowed only for suspected harness nondeterminism or fixture failure; never to rescue an inconvenient result.
+- Hard cap: 6–8 total runs and at most two header revision cycles, then freeze header, fixtures, assertions, and environment. Mid-Stage-1 header iteration or fixture replacement invalidates the comparison.
+- Stage 1 margins are owner-approved values recorded in §6 before the pilot; Stage 0 data does not calibrate them.
+- Ambiguity triage of prompts, assertions, and rubric wording happens in the owner review of §12 step 5; there is no separate blinded reviewer role in Stage 0.
 
 ### Stage 1 — Product-thesis pilot
 
@@ -149,7 +152,7 @@ Seeded risks:
 
 ## 6. Primary measurements and initial decision rules
 
-Stage 0 calibrates these rules. Before Stage 1, replace provisional margins with owner-approved values and record them here; do not tune them after seeing Stage 1 outcomes.
+Before Stage 1, replace provisional margins with owner-approved values and record them here; do not tune them after seeing Stage 1 outcomes. Stage 0 produces no data for these rules.
 
 ### H1 — Prototype
 
@@ -289,9 +292,9 @@ Simplify or reject the architecture if:
 ## 12. Immediate next action
 
 1. Create a short portable posture header.
-2. Create only enough explore/design, debug, test/verify, and review guidance to run Stage 0.
-3. Build three deterministic evaluation fixtures and hidden assertions.
-4. Run Stage 0 in one pinned environment.
-5. Record results and revise the Stage 1 margins before expanding.
+2. Create only enough explore/design, debug, test/verify, and review guidance for Stage 1.
+3. Build two sacrificial fixtures (one Prototype, one Standard) with hidden assertions, plus known-good and known-faulty artifacts for mechanical assertion validation.
+4. Run the Stage 0 readiness gate (§3) in one pinned environment: two fixtures × three systems, defect detection only, within the hard cap.
+5. Freeze header, fixtures, assertions, and environment; record infrastructure-validation results and owner-approved Stage 1 margins before expanding.
 
 Do not build persistent state, a workflow engine, full Hardened coverage, or the complete capability library yet.

@@ -29,6 +29,6 @@ Read completely, in order:
 
 ## Before implementation
 
-Stage 0 and Stage 1 are complete (2026-08-30; Stage 0 record on D-014 and `spikes/eval/stage0/README.md`, Stage 1 verdicts in `spikes/eval/stage1/RESULTS.md`). The owner approved building the v1 extension (issue #5 comment); it exists at `extensions/right-sizing.ts` and passed an agy/codex/claude council review. The owner's six-task validation window is pending: do not retire pi-superpowers, install globally, or publish without explicit user direction.
+Stage 0 and Stage 1 are complete (2026-08-30; Stage 0 record on D-014 and `spikes/eval/stage0/README.md`, Stage 1 verdicts in `spikes/eval/stage1/RESULTS.md`). The owner approved building the v1 extension (issue #5 comment); it exists at `extensions/right-sizing.ts` and passed an agy/codex/claude council review. v0.1.0 was instruction-only. By owner decision (2026-08-30, overriding the council's one-file cap), v0.2.0 bundles `pi-superpowers` (pinned `github:coctostan/pi-superpowers#c339ba2`, MIT) plus the instruction — the Stage-1-measured configuration. Published to npm as `pi-adaptive-dev`; the owner judges fitness qualitatively in daily use.
 
 Do not commit, publish, or modify external repositories without explicit user direction.

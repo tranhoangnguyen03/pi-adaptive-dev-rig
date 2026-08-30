@@ -93,8 +93,8 @@ f38a338bcb1add59a7b4da01a30c54ff594df1fbb4d8b4aff64d76c1f1d14061  ./eval/stage1/
 d3b99c4cb1c98eca0761d990ed391f41bb600bff1bece706580fe7c882ca5a02  ./eval/stage1/fixtures/ux-ux2/repo/export.py
 9a35483bc14bb33c7a86ab4db9a7693bb3122e21b2869c9102608f8cc32eb043  ./eval/stage1/fixtures/ux-ux2/repo/README.md
 701e325b6b5cf06334d1ddad7ead8f3f5f4a3ce0fa761e5d2d12523395c69ce5  ./eval/stage1/fixtures/ux-ux2/repo/scores.json
-9169427b47c4b543c637cf93bdf613b3df942b167f26ac015bb3dc854efbc841  ./eval/stage1/README.md
-20d429810e238940416705e585e9f62f5d1ea55038ce3f384843b36089776e89  ./eval/stage1/runner/run.py
+c4e50d7a5b97c6cf48d43e83dff786233298c1c854a10807cd2299b59dc073b8  ./eval/stage1/README.md
+e551d6a6310ef898555948c77b9c8f4ce75fde257fa6c0b74ace28700969f907  ./eval/stage1/runner/run.py
 84d7edcb4aebaacf6c1cb0a1d4d403b965827a997ac3f88a98c190aff0da4cc2  ./eval/stage1/systems/adaptive.sh
 abf775bde2aa731cfa187536ede5d088077f4bb1483d180547fc5035c8da32fe  ./eval/stage1/systems/superpowers-instruction.sh
 abf775bde2aa731cfa187536ede5d088077f4bb1483d180547fc5035c8da32fe  ./eval/stage1/systems/superpowers.sh

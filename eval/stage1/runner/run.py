@@ -570,15 +570,27 @@ def load_ledger() -> dict:
     return json.loads(lp.read_text()) if lp.exists() else         {"cost_total": 0.0, "invocations": 0, "wall_s": 0.0, "followup_cost": 0.0}
 
 
-def preflight_caps(n_new_cells: int) -> str | None:
+def preflight_caps(n_new_cells: int) -> list:
+    """SOFT ceilings (D-015): warn + flag in the ledger; never stop runs.
+    Breaches are raised prominently at evaluation."""
     led = load_ledger()
+    flags = []
     if led["cost_total"] >= CEILING_COST_USD:
-        return f"cost ceiling reached: ${led['cost_total']:.2f}"
+        flags.append(f"cost ceiling exceeded: ${led['cost_total']:.2f}")
     if led["invocations"] + n_new_cells > CEILING_INVOCATIONS:
-        return f"invocation ceiling would be exceeded ({led['invocations']}+{n_new_cells}>{CEILING_INVOCATIONS})"
+        flags.append(f"invocation ceiling will exceed ({led['invocations']}+{n_new_cells}>{CEILING_INVOCATIONS})")
     if led["wall_s"] >= CEILING_WALL_S:
-        return f"wall-clock ceiling reached: {led['wall_s']:.0f}s"
-    return None
+        flags.append(f"wall-clock ceiling exceeded: {led['wall_s']:.0f}s")
+    if led.get("followup_cost", 0) >= FOLLOWUP_CEILING_USD:
+        flags.append(f"follow-up budget exceeded: ${led['followup_cost']:.2f}")
+    if flags:
+        existing = {(f.get("flag"), ) for f in led.get("ceiling_flags", [])}
+        for f in flags:
+            if (f,) not in existing:
+                led.setdefault("ceiling_flags", []).append(
+                    {"flag": f, "at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())})
+        (WS / "ledger.json").write_text(json.dumps(led, indent=1))
+    return flags
 
 
 def preflight_freezes() -> str | None:
@@ -676,10 +688,8 @@ def cmd_run(args):
         sel = [c for c in cells if c["anon"] == anon]
     else:
         sel = [c for c in cells if c["kind"] == "core"]
-    cap = preflight_caps(len(sel))
-    if cap:
-        print(f"CAP REFUSED: {cap}")
-        return 1
+    for f in preflight_caps(len(sel)):
+        print(f"CEILING FLAG (soft, D-015 — execution continues): {f}")
     for c in sel:
         execute_cell(c, results, rerun_ledger)
     return 0
@@ -721,6 +731,10 @@ def cmd_report():
         lines.append(f"- {fix} / {arm}: cells={n} median_tokens={med_t} "
                      f"median_wall={med_w}s defects="
                      f"{sum(1 for r in rs if r['defect_class'])}")
+    led = load_ledger()
+    if led.get("ceiling_flags"):
+        lines += ["", "## CEILING FLAGS (soft, D-015 — raised for evaluation)"]
+        lines += [f"- {f['flag']} — first recorded {f['at']}" for f in led["ceiling_flags"]]
     if defects:
         lines += ["", "## Defect-classified cells (predeclared criteria only)"]
         lines += [f"- {d['cell']}: {d['defect_class']} — {str(d.get('stderr_tail', ''))[:160]}"

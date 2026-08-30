@@ -361,6 +361,8 @@ undefined without a correction target; §6's "no ground truth" clause
 concerns H2 posture-selection grading, and reasonableness grading was
 added to honor it).
 
-**Approval record (owner to sign):** ______ on ______ — on approval this
-file is hash-frozen into the Stage 1 freeze manifest and scored runs may
-begin.
+**Approval record:** APPROVED by the owner on **2026-08-30** — all five
+items, with item 3 amended to soft flag-only ceilings (recorded as
+D-015 in `docs/DECISIONS.md`). This file is hash-frozen into the Stage 1
+freeze manifest; scored runs are authorized under schedule sha256
+`97017946…`.

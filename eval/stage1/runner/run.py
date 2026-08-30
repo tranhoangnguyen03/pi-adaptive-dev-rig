@@ -561,7 +561,7 @@ def execute_cell(c: dict, results: Path, rerun_ledger: list) -> None:
     (WS / "ledger.json").write_text(json.dumps(led, indent=1))
     summary = ", ".join(f"{k}={v['status']}" for k, v in verdict.items())
     print(f"[{c['anon']}] {c['fixture']}/{c['system']}"
-          f"{'' if c['kind'] == 'core' else '/' + c['mode']}"
+          f"{'' if c['kind'] in ('core', 'followup') else '/' + c['mode']}"
           f" wall={wall_s}s defect={defect} {summary}")
 
 

@@ -1,0 +1,26 @@
+{
+  "name": "pi-adaptive-dev",
+  "version": "0.1.0",
+  "description": "Pi extension that right-sizes the process to the task: injects the Stage-1-validated 57-word instruction into every agent start. The one-file, one-hook replacement for heavyweight dev-workflow packages.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "author": "tranhoangnguyen03",
+  "repository": "github:tranhoangnguyen03/pi-adaptive-dev-rig",
+  "keywords": [
+    "pi-package",
+    "pi",
+    "extension",
+    "right-sizing"
+  ],
+  "files": [
+    "extensions"
+  ],
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "pi": {
+    "extensions": [
+      "./extensions"
+    ]
+  }
+}

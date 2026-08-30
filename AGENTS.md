@@ -1,18 +1,18 @@
 # Agent guidance
 
-This repository is currently a design corpus for Pi Adaptive Dev Rig. There is no approved implementation plan or code architecture yet.
+This repository packages `pi-adaptive-dev`, a one-file Pi extension (see issue #5 and its binding v1 contract). The design corpus behind it lives in `spikes/` and is not published.
 
 ## Start here
 
 Read completely, in order:
 
 1. `README.md`
-2. `docs/DECISIONS.md`
-3. `docs/FOUNDATION.md`
-4. `docs/RESEARCH.md`
-5. `docs/EVALUATION.md`
+2. `spikes/docs/DECISIONS.md`
+3. `spikes/docs/FOUNDATION.md`
+4. `spikes/docs/RESEARCH.md`
+5. `spikes/docs/EVALUATION.md`
 
-`docs/DECISIONS.md` is authoritative. `docs/FOUNDATION.md` contains both accepted principles and clearly tagged provisional architecture. Do not silently convert recommendations or unresolved experiments into accepted decisions.
+`spikes/docs/DECISIONS.md` is authoritative. `spikes/docs/FOUNDATION.md` contains both accepted principles and clearly tagged provisional architecture. Do not silently convert recommendations or unresolved experiments into accepted decisions.
 
 ## Design constraints
 
@@ -29,6 +29,6 @@ Read completely, in order:
 
 ## Before implementation
 
-Stage 0 is complete (2026-08-30; see the completion record on D-014 and `eval/stage0/README.md`). The next implementable work is the Stage 1 pilot described in `docs/EVALUATION.md` §3 — read the "Stage 1 handoff" section in `eval/stage0/README.md` first. Stage 1 margins are owner-approved and recorded in `docs/EVALUATION.md` §6; do not tune them after seeing outcomes. A product implementation plan, persistent runtime state, or broad capability port still waits for Stage 1 evidence.
+Stage 0 and Stage 1 are complete (2026-08-30; Stage 0 record on D-014 and `spikes/eval/stage0/README.md`, Stage 1 verdicts in `spikes/eval/stage1/RESULTS.md`). The owner approved building the v1 extension (issue #5 comment); it exists at `extensions/right-sizing.ts` and passed an agy/codex/claude council review. The owner's six-task validation window is pending: do not retire pi-superpowers, install globally, or publish without explicit user direction.
 
 Do not commit, publish, or modify external repositories without explicit user direction.

@@ -1,71 +1,77 @@
-# Pi Adaptive Dev Rig
+# pi-adaptive-dev
 
-An evidence-calibrated development harness for [Pi](https://github.com/earendil-works/pi).
+A [Pi](https://github.com/earendil-works/pi) extension that right-sizes the
+development process to the task — with one file and one hook.
 
-## Status
+On every agent start it appends this block to the system prompt:
 
-**Design exploration. No implementation exists yet.**
+> Right-size the process to the task. Prototype/exploratory work needs only
+> the smallest convincing implementation plus named limitations. Ordinary
+> maintainable changes need targeted tests and fresh verification, not full
+> production ceremony. Reserve comprehensive hardening for consequential or
+> production-facing work. Skip heavyweight workflow phases the delivery claim
+> doesn't need.
+>
+> Before claiming completion, run the relevant checks and cite fresh evidence.
 
-This repository materializes the foundation developed through user interviews, landscape research, and independent reviews by Claude, Codex, and Antigravity.
+That's the entire product. No commands, tools, state, UI, telemetry, or
+workflow phases.
 
-## Product thesis
+## Why this exists
 
-Pi-superpowers contains valuable engineering capabilities, but exposes them through a workflow that assumes high process rigor for nearly every change. That is appropriate for some hardened work and disproportionate for prototypes and ordinary, limited-scale development.
+It replaced a 14-file adaptive postures/capabilities architecture and a
+13-skill workflow package. In a preregistered head-to-head evaluation
+(6 scenarios × 3 arms), the frozen instruction matched the full architecture
+on every preregistered operand while delivering ~96 vs ~1,437 guidance
+tokens, and halved median token burn at equal quality. Verdicts and
+limitations: [`spikes/eval/stage1/RESULTS.md`](spikes/eval/stage1/RESULTS.md).
 
-Pi Adaptive Dev Rig separates three concerns:
+The final sentence (fresh verification before completion claims) is an
+owner-approved refinement added after the trial; see
+[`spikes/docs/DECISIONS.md`](spikes/docs/DECISIONS.md).
 
-1. **Activity** — explore, design, troubleshoot, implement, review, promote.
-2. **Delivery posture** — Prototype, Standard, or Hardened.
-3. **Capability** — debugging, planning, testing, verification, review, isolation, delegation, and other techniques selected when useful.
+## Install
 
-> The posture defines the claim and evidence bar. The model chooses the least costly capabilities needed to support it.
+```bash
+pi install npm:pi-adaptive-dev
+```
 
-This is a **jig, not an assembly line**: stable posture, progressive guidance, executable project truth, and narrow safety boundaries without a mandatory development sequence.
+Try it without installing:
 
-## Documents
+```bash
+pi -e npm:pi-adaptive-dev
+```
 
-Read these in order when starting a fresh design or implementation session:
+Or load from a checkout:
 
-1. [`docs/DECISIONS.md`](docs/DECISIONS.md) — authoritative status of accepted, recommended, unresolved, and deferred choices.
-2. [`docs/FOUNDATION.md`](docs/FOUNDATION.md) — product, user experience, agent model, postures, and provisional architecture.
-3. [`docs/RESEARCH.md`](docs/RESEARCH.md) — source material and candidate landscape.
-4. [`docs/EVALUATION.md`](docs/EVALUATION.md) — staged experiments and falsification criteria required before expanding the system.
+```bash
+pi -e ./path/to/pi-adaptive-dev-rig
+```
 
-Agents should also read [`AGENTS.md`](AGENTS.md).
+## Behavior
 
-## Working vocabulary
+- Uses the documented `before_agent_start` hook; appends to the chained
+  system prompt and returns it. Nothing persisted, no conversation mutation.
+- Idempotent within a prompt chain: if the block is already present
+  (e.g. extension loaded twice), it makes no modification.
+- Single runtime file: `extensions/right-sizing.ts` — type-only import, no
+  dependencies, no I/O.
 
-- **Delivery posture:** the breadth and strength of evidence needed before making a delivery claim.
-- **Prototype:** answer the key question with the smallest convincing implementation and visible limitations.
-- **Standard:** make a maintainable repository change with targeted regression protection and fresh acceptance evidence.
-- **Hardened:** establish defensible confidence against the material consequences of failure.
-- **Capability:** an optional engineering technique, not a mandatory workflow phase.
-- **Promotion:** deliberately move an existing deliverable to a stronger posture.
-- **Posture header:** short portable guidance communicating the active posture and evidence rule.
-- **Delivery kernel:** an optional Pi runtime extension for posture state, reconstruction, and UI, justified only if evaluation shows it prevents meaningful drift.
+## Verify
 
-“Rig” names the product, “harness” names the system, and “jig” is its operating metaphor.
+```bash
+# package contents: only extensions/, README, LICENSE, package.json
+npm pack --dry-run
 
-## Non-goals
+# loads under Pi with no model spend (control: bogus path exits nonzero)
+pi -e . --offline --no-session --mode rpc </dev/null
+```
 
-The project is not intended to become:
+## Repository layout
 
-- three duplicated workflows;
-- an agent-managed Jira replacement;
-- a mandatory plan/document generator;
-- a universal TDD, worktree, or subagent policy;
-- a label that substitutes for evidence;
-- a broad policy engine attempting to mechanize engineering judgment.
+The npm package is the repo root. Research, decisions, and evaluation
+corpora live in [`spikes/`](spikes/RIG.md) and are not published.
 
 ## License
 
 Apache-2.0 — see [LICENSE](LICENSE).
-
-## Immediate next step
-
-Stage 1 executed 2026-08-30 (72 core + 12 UX cells, preregistered
-protocol, §7 follow-up round): verdicts in `eval/stage1/RESULTS.md` —
-H1 not met, H2 not met, H5 kill (simplify; the one-line right-sizing
-instruction matched the full architecture on every preregistered
-operand). The architecture is not carried forward; the corpus, runner,
-and sealed reserves remain for any future evaluation.

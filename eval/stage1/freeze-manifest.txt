@@ -1,4 +1,4 @@
-106d014a9eab436865965c0df7932441ffdd43fc513d7af5f7a6aa066b2ec154  ./eval/stage1/fixtures/p1-vendor-client/hidden/assertions/assert_p1.py
+2827c71dce6bdd0b628a0d6e71e2ed306e7464a30473254672d71e05181fd92c  ./eval/stage1/fixtures/p1-vendor-client/hidden/assertions/assert_p1.py
 d60167fd461a9d1ab0bace78013c4c9368b975160df0a7d2ffc8cfdb07935442  ./eval/stage1/fixtures/p1-vendor-client/hidden/expectations.json
 82d50ed933c9efc5ef33f7300b338bbcd95cadc96ddc8d86e3bb02d13d4c746d  ./eval/stage1/fixtures/p1-vendor-client/hidden/patches/faulty-1.patch
 1d662635a4d4944092952c73a70217fda02d55e82f57126bcbcb073ff75af33f  ./eval/stage1/fixtures/p1-vendor-client/hidden/patches/faulty-2.patch
@@ -95,7 +95,7 @@ d3b99c4cb1c98eca0761d990ed391f41bb600bff1bece706580fe7c882ca5a02  ./eval/stage1/
 701e325b6b5cf06334d1ddad7ead8f3f5f4a3ce0fa761e5d2d12523395c69ce5  ./eval/stage1/fixtures/ux-ux2/repo/scores.json
 c4e50d7a5b97c6cf48d43e83dff786233298c1c854a10807cd2299b59dc073b8  ./eval/stage1/README.md
 a58fc168338c2c8c7927a2f6c509f9d4e1911f78c59d01c9d28d6f3e466a6611  ./eval/stage1/runner/run.py
-84d7edcb4aebaacf6c1cb0a1d4d403b965827a997ac3f88a98c190aff0da4cc2  ./eval/stage1/systems/adaptive.sh
+15349b04704d7c184e17770f893660713f72229714b386829b176cdee10d989c  ./eval/stage1/systems/adaptive.sh
 abf775bde2aa731cfa187536ede5d088077f4bb1483d180547fc5035c8da32fe  ./eval/stage1/systems/superpowers-instruction.sh
 abf775bde2aa731cfa187536ede5d088077f4bb1483d180547fc5035c8da32fe  ./eval/stage1/systems/superpowers.sh
 c3e65e4a1d77abac23d98f3553f5a5f330fcee1f076fe6be92c7ce4575c78619  ./eval/stage1/systems/unaided.sh

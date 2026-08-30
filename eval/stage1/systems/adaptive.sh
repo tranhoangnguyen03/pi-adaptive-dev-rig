@@ -6,7 +6,7 @@
 # modified (verify: shasum -c eval/stage0/freeze-manifest.txt).
 set -euo pipefail
 WS="$1"; PROMPT_FILE="$2"
-STAGE0_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../stage0" && pwd)"
+STAGE0_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../stage0" && pwd)"
 cd "$WS"
 exec pi -p \
   --provider 9-router \

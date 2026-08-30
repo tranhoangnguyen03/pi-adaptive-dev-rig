@@ -506,7 +506,7 @@ def execute_cell(c: dict, results: Path, rerun_ledger: list) -> None:
     changed = changed_files(ws)                       # after-work timeouts
     work_happened = bool(changed)                     # ARE graded (council r1)
     verdict = (run_assertions(c["fixture"], ws, changed)
-               if c["kind"] == "core" else
+               if c["kind"] in ("core", "followup") else
                {"UX": {"status": "n/a", "detail": "graded by coder, not mechanically"}})
     stdout_dir = WS / "stdout"
     stdout_dir.mkdir(parents=True, exist_ok=True)

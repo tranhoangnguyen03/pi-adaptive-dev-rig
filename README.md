@@ -1,9 +1,12 @@
 # pi-adaptive-dev
 
-A [Pi](https://github.com/earendil-works/pi) extension that right-sizes the
-development process to the task — with one file and one hook.
+A [Pi](https://github.com/earendil-works/pi) package that bundles the
+[pi-superpowers](https://github.com/coctostan/pi-superpowers) workflow skills
+with the Stage-1-validated right-sizing instruction.
 
-On every agent start it appends this block to the system prompt:
+You get the full toolkit — 13 workflow skills plus the plan tracker — and one
+instruction, appended to the system prompt on every agent start, that keeps the
+toolkit sized to the task:
 
 > Right-size the process to the task. Prototype/exploratory work needs only
 > the smallest convincing implementation plus named limitations. Ordinary
@@ -14,21 +17,11 @@ On every agent start it appends this block to the system prompt:
 >
 > Before claiming completion, run the relevant checks and cite fresh evidence.
 
-That's the entire product. No commands, tools, state, UI, telemetry, or
-workflow phases.
-
-## Why this exists
-
-It replaced a 14-file adaptive postures/capabilities architecture and a
-13-skill workflow package. In a preregistered head-to-head evaluation
-(6 scenarios × 3 arms), the frozen instruction matched the full architecture
-on every preregistered operand while delivering ~96 vs ~1,437 guidance
-tokens, and halved median token burn at equal quality. Verdicts and
+In a preregistered head-to-head evaluation, superpowers + this instruction
+matched both the bare-superpowers and full adaptive-architecture arms on every
+preregistered operand, while halving superpowers' median token burn
+(182k→104k) — the instruction suppresses package over-compliance. Verdicts and
 limitations: [`spikes/eval/stage1/RESULTS.md`](spikes/eval/stage1/RESULTS.md).
-
-The final sentence (fresh verification before completion claims) is an
-owner-approved refinement added after the trial; see
-[`spikes/docs/DECISIONS.md`](spikes/docs/DECISIONS.md).
 
 ## Install
 
@@ -50,28 +43,31 @@ pi -e ./path/to/pi-adaptive-dev-rig
 
 ## Behavior
 
-- Uses the documented `before_agent_start` hook; appends to the chained
-  system prompt and returns it. Nothing persisted, no conversation mutation.
-- Idempotent within a prompt chain: if the block is already present
-  (e.g. extension loaded twice), it makes no modification.
-- Single runtime file: `extensions/right-sizing.ts` — type-only import, no
-  dependencies, no I/O.
+- `extensions/right-sizing.ts` uses the documented `before_agent_start` hook;
+  appends the instruction to the chained system prompt. Idempotent within a
+  prompt chain; no persisted messages, no conversation mutation.
+- `pi-superpowers` is bundled (MIT) and pinned at commit `c339ba2`: its 13
+  skills and plan-tracker extension load from `node_modules/`. Update = change
+  the pinned ref and republish.
+- Installing this package replaces installing `pi-superpowers` separately.
 
 ## Verify
 
 ```bash
-# package contents: only extensions/, README, LICENSE, package.json
+# package contents: extensions/ + bundled node_modules/pi-superpowers
 npm pack --dry-run
 
 # loads under Pi with no model spend (control: bogus path exits nonzero)
 pi -e . --offline --no-session --mode rpc </dev/null
 ```
 
+## Licenses
+
+Apache-2.0 (this package) and MIT
+([pi-superpowers](https://github.com/coctostan/pi-superpowers), bundled under
+`node_modules/pi-superpowers/` with its LICENSE).
+
 ## Repository layout
 
 The npm package is the repo root. Research, decisions, and evaluation
 corpora live in [`spikes/`](spikes/RIG.md) and are not published.
-
-## License
-
-Apache-2.0 — see [LICENSE](LICENSE).

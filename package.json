@@ -1,7 +1,7 @@
 {
   "name": "pi-adaptive-dev",
-  "version": "0.1.0",
-  "description": "Pi extension that right-sizes the process to the task: injects the Stage-1-validated 57-word instruction into every agent start. The one-file, one-hook replacement for heavyweight dev-workflow packages.",
+  "version": "0.2.0",
+  "description": "Pi extension bundling the pi-superpowers workflow skills with the Stage-1-validated right-sizing instruction: full toolkit, sized to the task, verification before completion claims.",
   "type": "module",
   "license": "Apache-2.0",
   "author": "tranhoangnguyen03",
@@ -10,17 +10,28 @@
     "pi-package",
     "pi",
     "extension",
-    "right-sizing"
+    "right-sizing",
+    "superpowers"
   ],
   "files": [
     "extensions"
+  ],
+  "dependencies": {
+    "pi-superpowers": "github:coctostan/pi-superpowers#c339ba2"
+  },
+  "bundledDependencies": [
+    "pi-superpowers"
   ],
   "engines": {
     "node": ">=22.19.0"
   },
   "pi": {
     "extensions": [
-      "./extensions"
+      "./extensions",
+      "./node_modules/pi-superpowers/extensions/plan-tracker.ts"
+    ],
+    "skills": [
+      "./node_modules/pi-superpowers/skills"
     ]
   }
 }

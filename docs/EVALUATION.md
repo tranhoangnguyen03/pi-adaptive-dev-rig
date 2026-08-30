@@ -45,7 +45,13 @@ Purpose: build the Stage 1 prerequisites and remove mechanical defects before an
 - Stage 1 margins are owner-approved values recorded in §6 before the pilot; Stage 0 data does not calibrate them.
 - Ambiguity triage of prompts, assertions, and rubric wording happens in the owner review of §12 step 5; there is no separate blinded reviewer role in Stage 0.
 
-### Stage 1 — Product-thesis pilot
+### Stage 1 — Product-thesis pilot — EXECUTED 2026-08-30
+
+**Outcome (see `eval/stage1/RESULTS.md`):** H1 not met (quality
+preserved, no efficiency gain), H2 not met (no rubric separation; item-0
+clause failed), H5 kill — simplify: the one-line right-sizing
+instruction matched the full adaptive architecture on every
+preregistered operand. The architecture is not carried forward.
 
 Purpose: test H1, H2, H5, and the optimistic-declaration UX.
 

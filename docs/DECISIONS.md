@@ -96,6 +96,29 @@ The owner waived the original Stage 0 question — whether the postures produce 
 
 **Status: completed 2026-08-30.** 7 runs of the 8 cap (6 cells + 1 predeclared diagnostic rerun); 0 of 2 header revision cycles used. Freeze, remediation trail, and the owner-delegated council approval are recorded in `eval/stage0/README.md`. Stage 1 margins were adopted verbatim as owner-approved and recorded in `docs/EVALUATION.md` §6; nothing from Stage 0 counts as hypothesis evidence.
 
+### D-015 — Stage 1 protocol approved; ceilings are soft flags, not stops
+
+**Status: accepted (owner, 2026-08-30).** The owner approved the Stage 1
+owner-checkpoint proposals in `eval/stage1/README.md` §12 after the
+round-1 council remediation (claude + codex REMEDIATE-FIRST, all
+blockers/majors fixed, re-validated 28/28):
+
+1. H5 kill-rule operationalized §6-verbatim (5pp on task/rubric success;
+   no-worse protection; fewer tokens OR less maintenance surface);
+   combined score descriptive only.
+2. Near-boundary trigger and variance/heterogeneity branch rule as
+   preregistered (§7).
+3. Ceilings ($200 total / $40 follow-up / 102 invocations / 10h) are
+   **soft**: the runner warns and records breach flags in the ledger;
+   execution continues; breaches are raised prominently at evaluation.
+   (Owner override of the council's hard-stop proposal.)
+4. Six scored scenarios + two sealed reserves as built (§3).
+5. Leakage threshold and consequence as preregistered (§8).
+
+Scored runs are authorized under the frozen schedule
+(sha256 `97017946…`). Margins remain the locked §6 values; H1/H5 are
+applied verbatim; nothing observed mid-run may tune them.
+
 ## Recommended
 
 ### R-001 — Use “delivery posture” as the primary term

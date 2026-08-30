@@ -63,4 +63,9 @@ Apache-2.0 — see [LICENSE](LICENSE).
 
 ## Immediate next step
 
-Stage 0 is complete and frozen (`eval/stage0/README.md`). Run the Stage 1 pilot per `docs/EVALUATION.md` §3 to decide whether the guidance architecture deserves a larger validation program; entry conditions and the Stage 1 handoff are recorded in `eval/stage0/README.md`. Do not build the delivery kernel or port the full Pi-superpowers skill suite upfront.
+Stage 1 executed 2026-08-30 (72 core + 12 UX cells, preregistered
+protocol, §7 follow-up round): verdicts in `eval/stage1/RESULTS.md` —
+H1 not met, H2 not met, H5 kill (simplify; the one-line right-sizing
+instruction matched the full architecture on every preregistered
+operand). The architecture is not carried forward; the corpus, runner,
+and sealed reserves remain for any future evaluation.

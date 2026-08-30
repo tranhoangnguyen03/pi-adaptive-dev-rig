@@ -45,7 +45,13 @@ Purpose: build the Stage 1 prerequisites and remove mechanical defects before an
 - Stage 1 margins are owner-approved values recorded in §6 before the pilot; Stage 0 data does not calibrate them.
 - Ambiguity triage of prompts, assertions, and rubric wording happens in the owner review of §12 step 5; there is no separate blinded reviewer role in Stage 0.
 
-### Stage 1 — Product-thesis pilot
+### Stage 1 — Product-thesis pilot — EXECUTED 2026-08-30
+
+**Outcome (see `eval/stage1/RESULTS.md`):** H1 not met (quality
+preserved, no efficiency gain), H2 not met (no rubric separation; item-0
+clause failed), H5 kill — simplify: the one-line right-sizing
+instruction matched the full adaptive architecture on every
+preregistered operand. The architecture is not carried forward.
 
 Purpose: test H1, H2, H5, and the optimistic-declaration UX.
 
@@ -293,10 +299,12 @@ Simplify or reject the architecture if:
 
 ## 12. Immediate next action
 
-1. Create a short portable posture header.
-2. Create only enough explore/design, debug, test/verify, and review guidance for Stage 1.
-3. Build two sacrificial fixtures (one Prototype, one Standard) with hidden assertions, plus known-good and known-faulty artifacts for mechanical assertion validation.
-4. Run the Stage 0 readiness gate (§3) in one pinned environment: two fixtures × three systems, defect detection only, within the hard cap.
-5. Freeze header, fixtures, assertions, and environment; record infrastructure-validation results and owner-approved Stage 1 margins before expanding.
+Stage 0 is complete and frozen (2026-08-30; record in `eval/stage0/README.md`, D-014 status in `docs/DECISIONS.md`). Stage 1 proceeds:
+
+1. Preregister the Stage 1 protocol in `eval/stage1/README.md` (pinned environment, four symmetric systems, estimands, coding rules, H5 formula, schedule seed/hash, rerun criteria, ceilings) — owner approval required before any scored run.
+2. Build six scored scenarios plus two sealed reserve fixtures with two-sided mechanically validated hidden assertions (Stage 0 authoring rules apply: assert only stated policies).
+3. Run the 72-cell core matrix and 12-cell UX sidecar under the frozen randomized schedule; balanced rounds; predeclared diagnostic-rerun criteria only.
+4. Grade blinded (two independent reviewers for H2; mechanical assertions primary); report per-scenario and pooled descriptive results against the locked §6 margins.
+5. Apply the H5 descriptive gate (one pre-registered follow-up round at most); record the decision in `docs/DECISIONS.md`; keep raw traces outside repository state.
 
 Do not build persistent state, a workflow engine, full Hardened coverage, or the complete capability library yet.

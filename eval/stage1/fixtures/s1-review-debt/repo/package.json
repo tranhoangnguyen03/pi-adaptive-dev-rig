@@ -1,0 +1,7 @@
+{
+  "name": "conflow",
+  "version": "1.4.0",
+  "type": "module",
+  "description": "tiny flow config client",
+  "scripts": { "test": "node --test tests/" }
+}

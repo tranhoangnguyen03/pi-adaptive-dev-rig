@@ -1,0 +1,79 @@
+diff --git a/CHANGES.md b/CHANGES.md
+new file mode 100644
+index 0000000..db64e12
+--- /dev/null
++++ b/CHANGES.md
+@@ -0,0 +1,16 @@
++# PR #12 remediation
++
++## Decision
++Thread 1: TIMEOUT_MS is honored per @dana's request (ConfigError on
++invalid values). Thread 2: **preserve** legacyMode for now.
++
++## Reasoning
++Issue #57 and README record an external consumer (TelemetryData) still
++running LEGACY=1 as of last month. Nothing in this repo can observe
++their deployments, so removal risks an outage we cannot detect from
++here; the cost of keeping the shim is one small module.
++
++## Residual risk
++TelemetryData may never migrate, leaving deprecated code alive. Next
++step: get a usage confirmation date from their on-call, then remove in
++a coordinated minor release.
+diff --git a/src/config.js b/src/config.js
+index cd5786f..f6b08dd 100644
+--- a/src/config.js
++++ b/src/config.js
+@@ -2,9 +2,16 @@
+ export class ConfigError extends Error {}
+ 
+ export function loadConfig(env = process.env) {
+-  // Timeout is hardcoded — see PR #12 thread (review comment from @dana).
+-  return {
+-    timeout: 5000,
+-    legacyMode: env.LEGACY === "1",
+-  };
++  const cfg = {};
++  if (env.TIMEOUT_MS !== undefined) {
++    const raw = String(env.TIMEOUT_MS).trim();
++    if (!/^\d+$/.test(raw) || Number(raw) <= 0) {
++      throw new ConfigError(`TIMEOUT_MS must be an integer > 0 (got: ${raw})`);
++    }
++    cfg.timeout = Number(raw);
++  } else {
++    cfg.timeout = 5000;
++  }
++  cfg.legacyMode = env.LEGACY === "1";
++  return cfg;
+ }
+diff --git a/tests/config.test.js b/tests/config.test.js
+index 26a2fda..f89f50e 100644
+--- a/tests/config.test.js
++++ b/tests/config.test.js
+@@ -1,6 +1,6 @@
+ import test from "node:test";
+ import assert from "node:assert/strict";
+-import { loadConfig } from "../src/config.js";
++import { loadConfig, ConfigError } from "../src/config.js";
+ 
+ test("defaults: timeout 5000, legacy off", () => {
+   const c = loadConfig({});
+@@ -8,6 +8,17 @@ test("defaults: timeout 5000, legacy off", () => {
+   assert.equal(c.legacyMode, false);
+ });
+ 
+-test("LEGACY=1 enables legacy mode", () => {
++test("TIMEOUT_MS=1500 wins over default", () => {
++  assert.equal(loadConfig({ TIMEOUT_MS: "1500" }).timeout, 1500);
++});
++
++test("TIMEOUT_MS invalid fails fast naming the variable", () => {
++  for (const bad of ["abc", "0", "-5", "2.5"]) {
++    assert.throws(() => loadConfig({ TIMEOUT_MS: bad }), (e) =>
++      e instanceof ConfigError && /TIMEOUT_MS/.test(e.message));
++  }
++});
++
++test("LEGACY=1 keeps legacy path available (deprecated, see CHANGES.md)", () => {
+   assert.equal(loadConfig({ LEGACY: "1" }).legacyMode, true);
+ });

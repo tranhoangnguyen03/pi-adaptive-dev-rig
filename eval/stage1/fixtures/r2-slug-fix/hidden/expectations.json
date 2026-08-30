@@ -1,0 +1,20 @@
+{
+ "good-a": {
+  "H1_callers_correct": "pass",
+  "H2_root_cause": "pass",
+  "H3_regression_pinned": "pass",
+  "H4_suite_green": "pass"
+ },
+ "faulty-1": {
+  "H1_callers_correct": "fail",
+  "H2_root_cause": "fail",
+  "H3_regression_pinned": "fail",
+  "H4_suite_green": "fail"
+ },
+ "faulty-2": {
+  "H1_callers_correct": "pass",
+  "H2_root_cause": "pass",
+  "H3_regression_pinned": "fail",
+  "H4_suite_green": "pass"
+ }
+}

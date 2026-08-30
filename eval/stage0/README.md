@@ -205,8 +205,8 @@ recorded in docs/EVALUATION.md §6. Run-cap interpretation ratified
 
 - Header, guidance, fixtures, assertions, environment: frozen (manifest
   above + this branch's commits).
-- Owner review pending (§12 step 5): approve D14 margins into
-  `docs/EVALUATION.md` §6; see workspace `ambiguities.md`.
+- Owner review complete: D14 margins approved and recorded in
+  `docs/EVALUATION.md` §6 (2026-08-30).
 - Sacrificial fixtures remain excluded from Stage 1's scored set.
 
 ## Stage 1 handoff

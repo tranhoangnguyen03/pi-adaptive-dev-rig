@@ -1,0 +1,26 @@
+{
+ "good-keep": {
+  "D1_timeout_env": "pass",
+  "D2_decision_consistent": "pass",
+  "D3_fresh_tests": "pass",
+  "D4_decision_recorded": "pass"
+ },
+ "good-remove": {
+  "D1_timeout_env": "pass",
+  "D2_decision_consistent": "pass",
+  "D3_fresh_tests": "pass",
+  "D4_decision_recorded": "pass"
+ },
+ "faulty-1": {
+  "D1_timeout_env": "fail",
+  "D2_decision_consistent": "fail",
+  "D3_fresh_tests": "pass",
+  "D4_decision_recorded": "pass"
+ },
+ "faulty-2": {
+  "D1_timeout_env": "pass",
+  "D2_decision_consistent": "fail",
+  "D3_fresh_tests": "fail",
+  "D4_decision_recorded": "pass"
+ }
+}

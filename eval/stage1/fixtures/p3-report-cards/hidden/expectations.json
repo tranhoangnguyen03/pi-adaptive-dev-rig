@@ -1,0 +1,20 @@
+{
+ "good-a": {
+  "C1_rows_sorted": "pass",
+  "C2_totals": "pass",
+  "C3_exclusion_policy": "pass",
+  "C4_scope": "pass"
+ },
+ "faulty-1": {
+  "C1_rows_sorted": "fail",
+  "C2_totals": "pass",
+  "C3_exclusion_policy": "pass",
+  "C4_scope": "pass"
+ },
+ "faulty-2": {
+  "C1_rows_sorted": "pass",
+  "C2_totals": "fail",
+  "C3_exclusion_policy": "pass",
+  "C4_scope": "pass"
+ }
+}

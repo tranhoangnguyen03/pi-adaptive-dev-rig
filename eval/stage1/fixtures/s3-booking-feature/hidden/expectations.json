@@ -1,0 +1,17 @@
+{
+ "good-a": {
+  "F1_hold_semantics": "pass",
+  "F2_pattern_fit": "pass",
+  "F3_fresh_tests": "pass"
+ },
+ "faulty-1": {
+  "F1_hold_semantics": "fail",
+  "F2_pattern_fit": "fail",
+  "F3_fresh_tests": "pass"
+ },
+ "faulty-2": {
+  "F1_hold_semantics": "pass",
+  "F2_pattern_fit": "fail",
+  "F3_fresh_tests": "pass"
+ }
+}

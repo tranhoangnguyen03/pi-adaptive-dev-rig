@@ -1,0 +1,132 @@
+diff --git a/lib/workdays.py b/lib/workdays.py
+new file mode 100644
+index 0000000..8b817ee
+--- /dev/null
++++ b/lib/workdays.py
+@@ -0,0 +1,36 @@
++"""Working days per month — promoted from scripts/prototype_workdays.py.
++
++Behavior contract lives in the task/README: holiday parsing quirks
++(weekend no-effect, impossible dates skipped+counted) are preserved
++exactly.
++"""
++import calendar
++from typing import Tuple
++
++
++def summarize(year: int, holidays_text: str) -> Tuple[str, int]:
++    """Summarize working days per month into (csv_out, skipped_count)."""
++    holidays: set = set()
++    skipped = 0
++    for line in holidays_text.splitlines():
++        line = line.strip()
++        if not line:
++            continue
++        try:
++            m, d = map(int, line.split("-"))
++            if not (1 <= m <= 12 and 1 <= d <= 31):
++                raise ValueError
++            if calendar.weekday(year, m, d) >= 5:
++                continue
++            holidays.add((m, d))
++        except ValueError:
++            skipped += 1
++            continue
++    rows = ["month,workdays"]
++    for month in range(1, 13):
++        days = calendar.monthrange(year, month)[1]
++        wd = sum(1 for d in range(1, days + 1)
++                 if calendar.weekday(year, month, d) < 5
++                 and (month, d) not in holidays)
++        rows.append(f"{month},{wd}")
++    return "\n".join(rows) + "\n", skipped
+diff --git a/scripts/prototype_workdays.py b/scripts/prototype_workdays.py
+index b4c7120..27b6fad 100644
+--- a/scripts/prototype_workdays.py
++++ b/scripts/prototype_workdays.py
+@@ -1,34 +1,16 @@
+-# quick+dirty: working days per month. works. messy on purpose.
+-import calendar, sys
++# Thin wrapper — logic lives in lib/workdays.py now.
++import sys
+ 
+-def run(year, holiday_lines):
+-    holidays = set()
+-    skipped = 0
+-    for ln in holiday_lines:
+-        ln = ln.strip()
+-        if not ln:
+-            continue
+-        try:
+-            m, d = map(int, ln.split("-"))
+-            if not (1 <= m <= 12 and 1 <= d <= 31):
+-                raise ValueError
+-            if calendar.weekday(year, m, d) >= 5:
+-                continue          # weekend holiday: no effect, consumed
+-            holidays.add((m, d))
+-        except ValueError:
+-            skipped += 1
+-            continue
+-    rows = ["month,workdays"]
+-    for month in range(1, 13):
+-        days = calendar.monthrange(year, month)[1]
+-        wd = sum(1 for d in range(1, days + 1)
+-                 if calendar.weekday(year, month, d) < 5
+-                 and (month, d) not in holidays)
+-        rows.append(f"{month},{wd}")
+-    return "\n".join(rows) + "\n", skipped
++from lib.workdays import summarize
+ 
+-if __name__ == "__main__":
+-    out, skipped = run(int(sys.argv[1]), open(sys.argv[2]).read().splitlines()
+-                       if len(sys.argv) > 2 else [])
++
++def main():
++    year = int(sys.argv[1])
++    lines = open(sys.argv[2]).read().splitlines() if len(sys.argv) > 2 else []
++    out, skipped = summarize(year, lines)
+     sys.stderr.write(f"skipped {skipped}\n")
+     sys.stdout.write(out)
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/tests/test_workdays.py b/tests/test_workdays.py
+new file mode 100644
+index 0000000..8b08f75
+--- /dev/null
++++ b/tests/test_workdays.py
+@@ -0,0 +1,33 @@
++"""Tests for lib.workdays — behavior contract from the prototype."""
++import unittest
++
++from lib.workdays import summarize
++
++
++class WorkdaysTest(unittest.TestCase):
++    def test_weekend_holiday_has_no_effect_and_is_consumed(self):
++        base, _ = summarize(2025, "")
++        with_hol, skipped = summarize(2025, "7-5")  # Saturday
++        self.assertEqual(base, with_hol)
++        self.assertEqual(skipped, 0)
++
++    def test_impossible_dates_are_skipped_and_counted(self):
++        for line in ("2-30", "2-29"):  # 2025 is non-leap
++            _, skipped = summarize(2025, line)
++            self.assertEqual(skipped, 1)
++
++    def test_weekday_holiday_removes_that_day(self):
++        base, _ = summarize(2025, "")
++        with_hol, _ = summarize(2025, "7-4")  # Friday
++        b = int(base.splitlines()[7].split(",")[1])
++        h = int(with_hol.splitlines()[7].split(",")[1])
++        self.assertEqual(b - h, 1)
++
++    def test_empty_holiday_list(self):
++        out, skipped = summarize(2025, "")
++        self.assertEqual(len(out.splitlines()), 13)
++        self.assertEqual(skipped, 0)
++
++
++if __name__ == "__main__":
++    unittest.main()

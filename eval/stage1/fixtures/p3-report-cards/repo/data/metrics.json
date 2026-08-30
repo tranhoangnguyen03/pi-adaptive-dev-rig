@@ -1,0 +1,248 @@
+[
+ {
+  "id": "r00",
+  "name": "alpha-0",
+  "score": 6.47,
+  "category": "core"
+ },
+ {
+  "id": "r01",
+  "name": "bravo-1",
+  "score": 46.86,
+  "category": "ops"
+ },
+ {
+  "id": "r02",
+  "name": "charlie-2",
+  "score": 68.53,
+  "category": "core"
+ },
+ {
+  "id": "r03",
+  "name": "delta-3",
+  "score": 54.52,
+  "category": "ops"
+ },
+ {
+  "id": "r04",
+  "name": "echo-4",
+  "score": 90.77,
+  "category": "edge"
+ },
+ {
+  "id": "r05",
+  "name": "foxtrot-5",
+  "score": 54.72,
+  "category": "edge"
+ },
+ {
+  "id": "r06",
+  "name": "golf-6",
+  "score": 79.12,
+  "category": "core"
+ },
+ {
+  "id": "r07",
+  "name": "hotel-7",
+  "score": 21.62,
+  "category": "ops"
+ },
+ {
+  "id": "r08",
+  "name": "india-8",
+  "score": 55.94,
+  "category": "ops"
+ },
+ {
+  "id": "r09",
+  "name": "juliet-9",
+  "score": 33.01,
+  "category": "ops"
+ },
+ {
+  "id": "r10",
+  "name": "kilo-10",
+  "score": 52.41,
+  "category": "ops"
+ },
+ {
+  "id": "r11",
+  "name": "lima-11",
+  "score": 18.28,
+  "category": "ops"
+ },
+ {
+  "id": "r12",
+  "name": "mike-12",
+  "score": 31.67,
+  "category": "ops"
+ },
+ {
+  "id": "r13",
+  "name": "november-13",
+  "score": 75.89,
+  "category": "core"
+ },
+ {
+  "id": "r14",
+  "name": "oscar-14",
+  "score": 67.06,
+  "category": "ops"
+ },
+ {
+  "id": "r15",
+  "name": "papa-15",
+  "score": 94.27,
+  "category": "edge"
+ },
+ {
+  "id": "r16",
+  "name": "quebec-16",
+  "score": 25.39,
+  "category": "edge"
+ },
+ {
+  "id": "r17",
+  "name": "romeo-17",
+  "score": 14.27,
+  "category": "core"
+ },
+ {
+  "id": "r18",
+  "name": "sierra-18",
+  "score": 31.1,
+  "category": "edge"
+ },
+ {
+  "id": "r19",
+  "name": "tango-19",
+  "score": 7.87,
+  "category": "core"
+ },
+ {
+  "id": "r20",
+  "name": "uniform-20",
+  "score": 56.94,
+  "category": "core"
+ },
+ {
+  "id": "r21",
+  "name": "victor-21",
+  "score": 74.29,
+  "category": "core"
+ },
+ {
+  "id": "r22",
+  "name": "whiskey-22",
+  "score": 83.86,
+  "category": "ops"
+ },
+ {
+  "id": "r23",
+  "name": "xray-23",
+  "score": 26.01,
+  "category": "core"
+ },
+ {
+  "id": "r24",
+  "name": "yankee-24",
+  "score": 44.35,
+  "category": "edge"
+ },
+ {
+  "id": "r25",
+  "name": "zulu-25",
+  "score": 58.17,
+  "category": "core"
+ },
+ {
+  "id": "r26",
+  "name": "ave-26",
+  "score": 79.6,
+  "category": "core"
+ },
+ {
+  "id": "r27",
+  "name": "bond-27",
+  "score": 51.54,
+  "category": "edge"
+ },
+ {
+  "id": "r28",
+  "name": "case-28",
+  "score": 14.8,
+  "category": "core"
+ },
+ {
+  "id": "r29",
+  "name": "dorn-29",
+  "score": 13.87,
+  "category": "ops"
+ },
+ {
+  "id": "r30",
+  "name": "alpha-30",
+  "score": 20.72,
+  "category": "edge"
+ },
+ {
+  "id": "r31",
+  "name": "bravo-31",
+  "score": 29.37,
+  "category": "ops"
+ },
+ {
+  "id": "r32",
+  "name": "charlie-32",
+  "score": 58.0,
+  "category": "core"
+ },
+ {
+  "id": "r33",
+  "name": "delta-33",
+  "score": 97.2,
+  "category": "ops"
+ },
+ {
+  "id": "r34",
+  "name": "echo-34",
+  "score": 22.47,
+  "category": "core"
+ },
+ {
+  "id": "r35",
+  "name": "foxtrot-35",
+  "score": 25.04,
+  "category": "edge"
+ },
+ {
+  "id": "r36",
+  "name": "golf-36",
+  "score": 86.1,
+  "category": "core"
+ },
+ {
+  "id": "r37",
+  "name": "hotel-37",
+  "score": 97.86,
+  "category": "edge"
+ },
+ {
+  "id": "r07",
+  "name": "dup-id",
+  "score": 99.9,
+  "category": "core"
+ },
+ {
+  "id": "r38",
+  "name": "null-score",
+  "score": null,
+  "category": "ops"
+ },
+ {
+  "id": "r39",
+  "name": "bad-score",
+  "score": "high",
+  "category": "edge"
+ }
+]

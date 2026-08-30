@@ -13,7 +13,7 @@ Commands:
                        its sha256 (refuses to overwrite unless --force)
   probes               flag-level symmetry probes (no model spend);
                        model-touching probes run post-approval only
-  run [--cell ID... | --round N | --all | --ux]
+  run [--cell ID... | --round N | --all | --ux | --followup]
                        execute scheduled cells (balanced resume: recorded
                        cells are skipped; --retry for diagnostic reruns)
   report               per-scenario + pooled summary into the workspace
@@ -685,12 +685,52 @@ def cmd_run(args):
                              "at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())})
         (WS / "rerun-ledger.json").write_text(json.dumps(rerun_ledger, indent=1))
         sel = [c for c in cells if c["anon"] == anon]
+    elif args[:1] == ["--followup"]:
+        # §7 branch 1 (pre-registered): one balanced repeat across all six
+        # scenarios x the two H5 arms. Core schedule stays frozen as
+        # schedule.core.json; followup cells are appended with fresh opaque IDs.
+        if not any(c.get("kind") == "followup" for c in cells):
+            core_backup = WS / "schedule.core.json"
+            if not core_backup.exists():
+                core_backup.write_text(json.dumps(sched, indent=1))
+            rng = random.Random(SEED + 1)
+            fu = [{"kind": "followup", "fixture": f, "system": arm,
+                   "repeat": REPEATS + 1, "round": REPEATS + 1}
+                  for f in SCORED for arm in ("superpowers-instruction", "adaptive")]
+            rng.shuffle(fu)
+            ids = [f"c{100 + i}" for i in range(1, len(fu) + 1)]
+            rng.shuffle(ids)
+            bodies = build_prompts()
+            prompts = WS / "prompts"
+            for c, anon in zip(fu, ids):
+                c["anon"] = anon
+                body = bodies[(c["fixture"], c["system"])]
+                c["prompt_sha"] = hashlib.sha256(body.encode()).hexdigest()
+                (prompts / f"{anon}.md").write_text(body)
+            cells.extend(fu)
+            anon_map = json.loads((WS / "cellmap.json").read_text())
+            for c in fu:
+                anon_map[c["anon"]] = {k: v for k, v in c.items() if k != "anon"}
+            (WS / "cellmap.json").write_text(json.dumps(anon_map, indent=1))
+            digest = canonical_schedule_hash({"seed": SEED, "cell_count": len(cells),
+                                              "cells": cells})
+            sched = {"seed": SEED, "cell_count": len(cells), "sha256": digest,
+                     "cells": cells, "followup_appended": True}
+            (WS / "schedule.json").write_text(json.dumps(sched, indent=1))
+            print(f"followup schedule appended: {len(fu)} cells (branch 1)")
+        sel = [c for c in cells if c.get("kind") == "followup"]
     else:
         sel = [c for c in cells if c["kind"] == "core"]
     for f in preflight_caps(len(sel)):
         print(f"CEILING FLAG (soft, D-015 — execution continues): {f}")
     for c in sel:
+        before = load_ledger()["cost_total"]
         execute_cell(c, results, rerun_ledger)
+        if c.get("kind") == "followup":
+            led = load_ledger()
+            led["followup_cost"] = round(led.get("followup_cost", 0.0)
+                                         + max(0.0, led["cost_total"] - before), 4)
+            (WS / "ledger.json").write_text(json.dumps(led, indent=1))
     return 0
 
 

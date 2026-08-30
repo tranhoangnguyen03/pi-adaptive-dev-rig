@@ -594,10 +594,9 @@ def preflight_caps(n_new_cells: int) -> list:
 
 
 def preflight_freezes() -> str | None:
-    for manifest, cwd in ((STAGE0 / "freeze-manifest.txt", REPO_ROOT),
-                          (STAGE1 / "freeze-manifest.txt", REPO_ROOT)):
-        if manifest.exists() and sh(["shasum", "-a", "256", "-c", manifest.name],
-                                    cwd=manifest.parent).returncode != 0:
+    for manifest in (STAGE0 / "freeze-manifest.txt", STAGE1 / "freeze-manifest.txt"):
+        if manifest.exists() and sh(["shasum", "-a", "256", "-c", str(manifest)],
+                                    cwd=REPO_ROOT).returncode != 0:
             return f"manifest check failed: {manifest}"
     doc = load_schedule()
     recomputed = canonical_schedule_hash({k: v for k, v in doc.items() if k != "sha256"})

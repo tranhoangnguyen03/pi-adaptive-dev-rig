@@ -46,9 +46,14 @@ pi -e ./path/to/pi-adaptive-dev-rig
 - `extensions/right-sizing.ts` uses the documented `before_agent_start` hook;
   appends the instruction to the chained system prompt. Idempotent within a
   prompt chain; no persisted messages, no conversation mutation.
-- `pi-superpowers` is bundled (MIT) and pinned at commit `c339ba2`: its 13
-  skills and plan-tracker extension load from `node_modules/`. Update = change
-  the pinned ref and republish.
+- `pi-superpowers` is bundled (MIT) and pinned at commit `c339ba2`. v0.3.0
+  tunes the core without a broad fork: 11 upstream skills load
+  (`writing-skills` — 84K of meta-material — and `dispatching-parallel-agents`
+  — redundant with the `pi-subagents` package — are excluded in the manifest);
+  `brainstorming` is vendored in-tree with its always-on description reworded
+  from "You MUST use this before any creative work" to a conditional trigger,
+  so it no longer fights the right-sizing instruction on every prompt.
+  `plan-tracker` stays in. Update = change the pinned ref and republish.
 - Installing this package replaces installing `pi-superpowers` separately.
 
 ## Verify

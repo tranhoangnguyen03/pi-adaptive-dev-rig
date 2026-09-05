@@ -1,6 +1,6 @@
 {
   "name": "pi-adaptive-dev",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Pi extension bundling the pi-superpowers workflow skills with the Stage-1-validated right-sizing instruction: full toolkit, sized to the task, verification before completion claims.",
   "type": "module",
   "license": "Apache-2.0",
@@ -14,7 +14,8 @@
     "superpowers"
   ],
   "files": [
-    "extensions"
+    "extensions",
+    "skills"
   ],
   "dependencies": {
     "pi-superpowers": "github:coctostan/pi-superpowers#c339ba2"
@@ -31,7 +32,11 @@
       "./node_modules/pi-superpowers/extensions/plan-tracker.ts"
     ],
     "skills": [
-      "./node_modules/pi-superpowers/skills"
+      "./skills",
+      "./node_modules/pi-superpowers/skills",
+      "!node_modules/pi-superpowers/skills/brainstorming",
+      "!node_modules/pi-superpowers/skills/writing-skills",
+      "!node_modules/pi-superpowers/skills/dispatching-parallel-agents"
     ]
   }
 }
